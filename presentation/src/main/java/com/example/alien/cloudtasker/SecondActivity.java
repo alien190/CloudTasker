@@ -3,14 +3,18 @@ package com.example.alien.cloudtasker;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.alien.cloudtasker.di.usersViewModel.UserViewModelModule;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import toothpick.Scope;
+import toothpick.Toothpick;
 
 public class SecondActivity extends SingleFragmentActivity {
 
@@ -27,7 +31,15 @@ public class SecondActivity extends SingleFragmentActivity {
 
     @Override
     protected Fragment getFragment() {
+        Scope scope = Toothpick.openScopes("Application", "SecondActivity");
+        scope.installModules(new UserViewModelModule(this));
         return TestFragment.newInstance();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Toothpick.closeScope("SecondActivity");
     }
 
     public static void start(Context context) {
