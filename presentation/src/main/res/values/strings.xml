@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">CloudTasker</string>
+    <string name="auth_error">Ошибка аутентификации</string>
+    <string name="logout">Выйти из аккаунта</string>
+</resources>
