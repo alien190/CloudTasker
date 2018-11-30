@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProviders;
 
 import com.example.alien.cloudtasker.UsersViewModel;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 import androidx.fragment.app.FragmentActivity;
@@ -13,6 +14,7 @@ class UsersViewModelProvider implements Provider<UsersViewModel> {
     private FragmentActivity mActivity;
     private UsersViewModelFactory mFactory;
 
+    @Inject
     public UsersViewModelProvider(FragmentActivity activity, UsersViewModelFactory factory) {
         mActivity = activity;
         mFactory = factory;

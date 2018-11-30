@@ -1,7 +1,9 @@
 package com.example.alien.cloudtasker;
 
+import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -27,6 +29,7 @@ public class SecondActivity extends SingleFragmentActivity {
             AuthActivity.start(this);
             finish();
         }
+       // clearCache();
     }
 
     @Override
@@ -76,5 +79,15 @@ public class SecondActivity extends SingleFragmentActivity {
                     AuthActivity.start(context);
                     finish();
                 });
+    }
+
+    public void clearCache(){
+        if (Build.VERSION_CODES.KITKAT <= Build.VERSION.SDK_INT) {
+            ((ActivityManager)getApplicationContext().getSystemService(ACTIVITY_SERVICE))
+                    .clearApplicationUserData(); // note: it has a return value!
+        } else {
+            // use old hacky way, which can be removed
+            // once minSdkVersion goes above 19 in a few years.
+        }
     }
 }

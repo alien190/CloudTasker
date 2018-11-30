@@ -5,6 +5,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.domain.model.DomainUser;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentChange;
@@ -14,9 +15,13 @@ import com.google.firebase.firestore.FirebaseFirestoreSettings;
 import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QuerySnapshot;
 
+import javax.inject.Inject;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import toothpick.Scope;
+import toothpick.Toothpick;
 
 public class TestFragment extends Fragment {
     private static final String USER_COLLECTION_NAME = "users";
@@ -24,6 +29,9 @@ public class TestFragment extends Fragment {
     private FirebaseFirestore mDatabase;
     private FirebaseUser mUser;
     private ListenerRegistration mRegistration;
+
+    @Inject
+    IUsersViewModel mUsersViewModel;
 
     public static TestFragment newInstance() {
 
@@ -40,8 +48,12 @@ public class TestFragment extends Fragment {
         View view = inflater.inflate(R.layout.fr_test, container, false);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser != null) {
-            initFirestore();
-            initListener();
+            //initFirestore();
+            //initListener();
+            Scope scope = Toothpick.openScopes("SecondActivity");
+            Toothpick.inject(this, scope);
+            mUsersViewModel.updateUser(new DomainUser(mUser.getUid(), mUser.getDisplayName(), null));
+            mUsersViewModel.getUsers();
         }
         return view;
     }

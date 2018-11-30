@@ -15,10 +15,10 @@ public class DatabaseModule extends Module {
     private ITaskRepository mLocalRepository;
 
     public DatabaseModule(Context context) {
-        mTaskDatabase = Room.databaseBuilder(context, TaskDatabase.class, "launch_database")
+        mTaskDatabase = Room.databaseBuilder(context, TaskDatabase.class, "task_database")
                 .fallbackToDestructiveMigration()
                 .build();
-        mLocalRepository = new TaskLocalRepository(mTaskDatabase);
+        mLocalRepository = new TaskLocalRepository(mTaskDatabase.getTaskDao());
         bind(ITaskRepository.class).withName(ITaskRepository.LOCAL).toInstance(mLocalRepository);
     }
 }

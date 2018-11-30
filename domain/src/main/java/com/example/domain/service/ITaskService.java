@@ -4,8 +4,10 @@ import com.example.domain.model.DomainUser;
 
 import java.util.List;
 
-import io.reactivex.Maybe;
+import io.reactivex.Completable;
+import io.reactivex.Flowable;
 
 public interface ITaskService {
-    Maybe<List<DomainUser>> getUserList();
+
+    Completable updateUser(DomainUser user);
 }

@@ -14,7 +14,7 @@ class TaskServiceProvider implements Provider<ITaskService> {
 
     @Inject
     public TaskServiceProvider(@Named(ITaskRepository.LOCAL) ITaskRepository taskRepositoryLocal,
-                                 @Named(ITaskRepository.REMOTE) ITaskRepository taskRepositoryRemote) {
+                               @Named(ITaskRepository.REMOTE) ITaskRepository taskRepositoryRemote) {
         mTaskRepositoryLocal = taskRepositoryLocal;
         mTaskRepositoryRemote = taskRepositoryRemote;
     }

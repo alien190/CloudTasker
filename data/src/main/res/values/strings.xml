@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">data</string>
+    <string name="clen_cache">Ошибка аутентификации. Приложение завершает работу.</string>
 </resources>
