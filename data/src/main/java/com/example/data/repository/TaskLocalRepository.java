@@ -93,7 +93,9 @@ public class TaskLocalRepository implements ITaskRepository {
 
     @Override
     public Flowable<List<DomainTask>> getTaskList() {
-        return mTaskDao.getTasksLive().map(DatabaseToDomainConverter::convertTasks).subscribeOn(Schedulers.io());
+        return mTaskDao.getTasksWithUsersLive()
+                .map(DatabaseToDomainConverter::convertTasksWithUsers)
+                .subscribeOn(Schedulers.io());
     }
 
     private Throwable getError() {

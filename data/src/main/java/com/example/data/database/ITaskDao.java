@@ -1,14 +1,12 @@
 package com.example.data.database;
 
 import com.example.data.model.DatabaseTask;
+import com.example.data.model.DatabaseTaskWithUsers;
 import com.example.data.model.DatabaseUser;
-
-import org.intellij.lang.annotations.Flow;
 
 import java.util.List;
 
 import androidx.room.Dao;
-import androidx.room.Delete;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
@@ -41,6 +39,15 @@ public interface ITaskDao {
     @Query("DELETE FROM databaseuser")
     void deleteAllUsers();
 
+    @Query("DELETE FROM databasetask")
+    void deleteAllTasks();
+
     @Query("DELETE FROM databasetask WHERE taskId=:taskId")
     void deleteTaskById(String taskId);
+
+    @Query("SELECT databasetask.*, authorName, executorName " +
+            "FROM databasetask " +
+            "JOIN (SELECT userId, userName AS authorName FROM databaseuser) AS authors ON databasetask.authorId=authors.userId " +
+            "JOIN (SELECT userId, userName AS executorName FROM databaseuser) AS executors ON databasetask.executorId=executors.userId")
+    Flowable<List<DatabaseTaskWithUsers>> getTasksWithUsersLive();
 }

@@ -7,18 +7,12 @@ public class DomainTask {
     private String title;
     private String text;
     private Type type;
+    private String authorName;
+    private String executorName;
 
     public DomainTask() {
     }
 
-    public DomainTask(String taskId, String authorId, String executorId, String title, String text, Type type) {
-        this.taskId = taskId;
-        this.authorId = authorId;
-        this.executorId = executorId;
-        this.title = title;
-        this.text = text;
-        this.type = type;
-    }
 
     public String getTaskId() {
         return taskId;
@@ -66,6 +60,22 @@ public class DomainTask {
 
     public void setType(Type type) {
         this.type = type;
+    }
+
+    public String getAuthorName() {
+        return authorName;
+    }
+
+    public void setAuthorName(String authorName) {
+        this.authorName = authorName;
+    }
+
+    public String getExecutorName() {
+        return executorName;
+    }
+
+    public void setExecutorName(String executorName) {
+        this.executorName = executorName;
     }
 
     public enum Type {

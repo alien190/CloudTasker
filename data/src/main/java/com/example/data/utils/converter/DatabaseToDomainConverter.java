@@ -1,6 +1,7 @@
 package com.example.data.utils.converter;
 
 import com.example.data.model.DatabaseTask;
+import com.example.data.model.DatabaseTaskWithUsers;
 import com.example.data.model.DatabaseUser;
 import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
@@ -68,5 +69,28 @@ public final class DatabaseToDomainConverter {
         } else {
             throw new IllegalArgumentException("databaseTasks can't be null");
         }
+    }
+
+    public static List<DomainTask> convertTasksWithUsers(List<DatabaseTaskWithUsers> databaseTasks) {
+        if (databaseTasks != null) {
+            List<DomainTask> domainTasks = new ArrayList<>();
+            for (DatabaseTaskWithUsers databaseTask : databaseTasks) {
+                try {
+                    domainTasks.add(convertTaskWithUsers(databaseTask));
+                } catch (Throwable throwable) {
+                    Timber.d(throwable);
+                }
+            }
+            return domainTasks;
+        } else {
+            throw new IllegalArgumentException("databaseTasks can't be null");
+        }
+    }
+
+    private static DomainTask convertTaskWithUsers(DatabaseTaskWithUsers databaseTask) {
+        DomainTask domainTask = convertTask(databaseTask);
+        domainTask.setAuthorName(databaseTask.getAuthorName());
+        domainTask.setExecutorName(databaseTask.getExecutorName());
+        return domainTask;
     }
 }
