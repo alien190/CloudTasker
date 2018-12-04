@@ -18,10 +18,10 @@ public class TaskServiceImpl implements ITaskService {
         mLocalRepository = localRepository;
         mRemoteRepository = remoteRepository;
         mDisposable = new CompositeDisposable();
-        updateUserList();
+        refreshUserList();
     }
 
-    private void updateUserList() {
+    private void refreshUserList() {
         mDisposable.add(mRemoteRepository.getUserList()
                 .doOnError(mRemoteRepository::cleanCacheIfNeed)
                 .flatMap(mLocalRepository::insertUsers)
@@ -36,4 +36,5 @@ public class TaskServiceImpl implements ITaskService {
                 //.doOnError(mRemoteRepository::cleanCacheIfNeed)
                 .subscribeOn(Schedulers.io());
     }
+
 }

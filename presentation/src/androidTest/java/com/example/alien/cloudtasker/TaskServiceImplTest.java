@@ -13,7 +13,6 @@ import com.example.domain.repository.ITaskRepository;
 import com.example.domain.service.ITaskService;
 import com.example.domain.service.TaskServiceImpl;
 
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -24,6 +23,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.model.Statement;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -32,7 +32,7 @@ import java.util.concurrent.Callable;
 
 import androidx.room.Room;
 import androidx.test.platform.app.InstrumentationRegistry;
-import io.reactivex.Flowable;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.plugins.RxJavaPlugins;
@@ -40,6 +40,7 @@ import io.reactivex.processors.PublishProcessor;
 import io.reactivex.schedulers.Schedulers;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 
@@ -47,24 +48,13 @@ import static org.mockito.Mockito.when;
 public class TaskServiceImplTest {
     private TaskDatabase mTaskDatabase;
     private ITaskDao mTaskDao;
-    private String mUpdatedUserId = "sdasdDSda3Adcr3edEwsffr";
-    private String mUpdatedUserName = "NewUserName";
 
     private ITaskRepository mTaskLocalRepository;
 
     @Mock
-    private TaskRemoteRepository mTaskRemoteRepositoryMockSingleUserWithBadUser;
-
-    @Mock
-    private TaskRemoteRepository mTaskRemoteRepositoryMockAddAndDeleteUser;
-
-    @Mock
-    private TaskRemoteRepository mTaskRemoteRepositoryMockUpdateUser;
-
-    @Mock
     private TaskRemoteRepository mTaskRemoteRepositoryWithPublisher;
 
-    private PublishProcessor<DomainUser> mDomainUserPublishProcessor;
+    private PublishProcessor<List<DomainUser>> mDomainUserPublishProcessor;
 
     private ITaskService mTaskService;
 
@@ -78,53 +68,43 @@ public class TaskServiceImplTest {
         mTaskDao = mTaskDatabase.getTaskDao();
         mTaskLocalRepository = new TaskLocalRepository(mTaskDao);
         mDomainUserPublishProcessor = PublishProcessor.create();
-        initTaskRemoteRepositoryMockSingleUserWithBadUser();
-        initTaskRemoteRepositoryMockAddAndDeleteUser();
-        initTaskRemoteRepositoryMockUpdateUser();
+        initTaskRemoteRepositoryWithPublisher();
+        mTaskService = new TaskServiceImpl(mTaskLocalRepository, mTaskRemoteRepositoryWithPublisher);
     }
 
-    private void initTaskRemoteRepositoryMockUpdateUser() {
-        List<DomainUser> domainUsers = new ArrayList<>();
-        DomainUser addedDomainUser = new DomainUser(mUpdatedUserId, "user01", DomainUser.Type.ADDED);
-        addedDomainUser.setLastLoginTime(new Date());
-        DomainUser updatedDomainUser = new DomainUser(mUpdatedUserId, mUpdatedUserName, DomainUser.Type.MODIFIED);
-        updatedDomainUser.setLastLoginTime(new Date());
-        domainUsers.add(addedDomainUser);
-        domainUsers.add(updatedDomainUser);
-        when(mTaskRemoteRepositoryMockUpdateUser.getUserList()).thenReturn(Flowable.just(domainUsers));
-    }
-
-    private void initTaskRemoteRepositoryMockSingleUserWithBadUser() {
-        List<DomainUser> domainUsers = new ArrayList<>();
-        DomainUser domainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.ADDED);
-        domainUser.setLastLoginTime(new Date());
-        domainUsers.add(domainUser);
-        domainUsers.add(new DomainUser("asdaasd", "broken user", DomainUser.Type.ADDED));
-        when(mTaskRemoteRepositoryMockSingleUserWithBadUser.getUserList()).thenReturn(Flowable.just(domainUsers));
-    }
-
-    private void initTaskRemoteRepositoryMockAddAndDeleteUser() {
-        List<DomainUser> domainUsers = new ArrayList<>();
-        DomainUser addedDomainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.ADDED);
-        addedDomainUser.setLastLoginTime(new Date());
-        DomainUser removedDomainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.REMOVED);
-        removedDomainUser.setLastLoginTime(new Date());
-        domainUsers.add(addedDomainUser);
-        domainUsers.add(removedDomainUser);
-        when(mTaskRemoteRepositoryMockAddAndDeleteUser.getUserList()).thenReturn(Flowable.just(domainUsers));
+    private void initTaskRemoteRepositoryWithPublisher() {
+        when(mTaskRemoteRepositoryWithPublisher.getUserList()).thenReturn(mDomainUserPublishProcessor);
+        when(mTaskRemoteRepositoryWithPublisher.updateUser(any())).thenAnswer((Answer<Completable>) invocation -> {
+            Object[] args = invocation.getArguments();
+            DomainUser domainUser = (DomainUser) args[0];
+            domainUser.setType(DomainUser.Type.MODIFIED);
+            domainUser.setLastLoginTime(new Date());
+            List<DomainUser> domainUsers = new ArrayList<>();
+            domainUsers.add(domainUser);
+            mDomainUserPublishProcessor.onNext(domainUsers);
+            return Completable.complete();
+        });
     }
 
     @After
     public void tearDown() throws Exception {
         mTaskService = null;
         mTaskLocalRepository = null;
-        mTaskRemoteRepositoryMockSingleUserWithBadUser = null;
+        mDomainUserPublishProcessor = null;
+        mTaskRemoteRepositoryWithPublisher = null;
         mTaskDatabase.close();
     }
 
     @Test
     public void testTaskServiceImplCreationSingleUserWithBadUser() {
-        mTaskService = new TaskServiceImpl(mTaskLocalRepository, mTaskRemoteRepositoryMockSingleUserWithBadUser);
+        List<DomainUser> domainUsers = new ArrayList<>();
+        DomainUser domainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.ADDED);
+        domainUser.setLastLoginTime(new Date());
+        domainUsers.add(domainUser);
+        domainUsers.add(new DomainUser("asdaasd", "broken user", DomainUser.Type.ADDED));
+
+        mDomainUserPublishProcessor.onNext(domainUsers);
+
         Single.fromCallable((Callable<Object>) () -> {
                     List<DatabaseUser> databaseUsers = mTaskDao.getUsers().blockingGet();
                     assertEquals(1, databaseUsers.size());
@@ -137,7 +117,16 @@ public class TaskServiceImplTest {
 
     @Test
     public void testTaskServiceImplCreationAddAndRemoveUser() {
-        mTaskService = new TaskServiceImpl(mTaskLocalRepository, mTaskRemoteRepositoryMockAddAndDeleteUser);
+        List<DomainUser> domainUsers = new ArrayList<>();
+        DomainUser addedDomainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.ADDED);
+        addedDomainUser.setLastLoginTime(new Date());
+        DomainUser removedDomainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.REMOVED);
+        removedDomainUser.setLastLoginTime(new Date());
+        domainUsers.add(addedDomainUser);
+        domainUsers.add(removedDomainUser);
+
+        mDomainUserPublishProcessor.onNext(domainUsers);
+
         Single.fromCallable((Callable<Object>) () -> {
                     List<DatabaseUser> databaseUsers = mTaskDao.getUsers().blockingGet();
                     assertEquals(0, databaseUsers.size());
@@ -147,13 +136,53 @@ public class TaskServiceImplTest {
                 .subscribeOn(Schedulers.io())
                 .subscribe();
     }
+
     @Test
     public void testTaskServiceImplCreationUpdateUser() {
-        mTaskService = new TaskServiceImpl(mTaskLocalRepository, mTaskRemoteRepositoryMockUpdateUser);
+        String updatedUserId = "sdasdDSda3Adcr3edEwsffr";
+        String updatedUserName = "NewUserName";
+
+        List<DomainUser> domainUsers = new ArrayList<>();
+        DomainUser addedDomainUser = new DomainUser(updatedUserId, "user01", DomainUser.Type.ADDED);
+        addedDomainUser.setLastLoginTime(new Date());
+        DomainUser updatedDomainUser = new DomainUser(updatedUserId, updatedUserName, DomainUser.Type.MODIFIED);
+        updatedDomainUser.setLastLoginTime(new Date());
+        domainUsers.add(addedDomainUser);
+        domainUsers.add(updatedDomainUser);
+
+        mDomainUserPublishProcessor.onNext(domainUsers);
+
         Single.fromCallable((Callable<Object>) () -> {
-                    DatabaseUser databaseUser = mTaskDao.getUserById(mUpdatedUserId).blockingGet();
-                    assertEquals(mUpdatedUserId, databaseUser.getUserId());
-                    assertEquals(mUpdatedUserName, databaseUser.getUserName());
+                    DatabaseUser databaseUser = mTaskDao.getUserById(updatedUserId).blockingGet();
+                    assertEquals(updatedUserId, databaseUser.getUserId());
+                    assertEquals(updatedUserName, databaseUser.getUserName());
+                    return 1;
+                }
+        )
+                .subscribeOn(Schedulers.io())
+                .subscribe();
+    }
+
+    @Test
+    public void testUserUpdate(){
+
+        String updatedUserId = "elkdfk4389jvdsfd43rksdfsd0923i0kd";
+        String updatedUserName = "NewUserName";
+
+        List<DomainUser> domainUsers = new ArrayList<>();
+        DomainUser addedDomainUser = new DomainUser(updatedUserId, "user01sdfsfs", DomainUser.Type.ADDED);
+        addedDomainUser.setLastLoginTime(new Date());
+        domainUsers.add(addedDomainUser);
+        mDomainUserPublishProcessor.onNext(domainUsers);
+
+        DomainUser renamedUsers = new DomainUser(updatedUserId, updatedUserName, null);
+
+        mTaskService.updateUser(renamedUsers);
+
+        Single.fromCallable((Callable<Object>) () -> {
+                    DatabaseUser databaseUser = mTaskDao.getUserById(updatedUserId).blockingGet();
+                    assertEquals(updatedUserId, databaseUser.getUserId());
+                    assertEquals(updatedUserName, databaseUser.getUserName());
                     return 1;
                 }
         )
