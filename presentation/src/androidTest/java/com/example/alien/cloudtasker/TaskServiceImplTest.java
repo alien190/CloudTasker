@@ -8,6 +8,7 @@ import com.example.data.database.TaskDatabase;
 import com.example.data.model.DatabaseUser;
 import com.example.data.repository.TaskLocalRepository;
 import com.example.data.repository.TaskRemoteRepository;
+import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 import com.example.domain.service.ITaskService;
@@ -56,6 +57,8 @@ public class TaskServiceImplTest {
 
     private PublishProcessor<List<DomainUser>> mDomainUserPublishProcessor;
 
+    private PublishProcessor<List<DomainTask>> mDomainTaskPublishProcessor;
+
     private ITaskService mTaskService;
 
     @Rule
@@ -84,6 +87,7 @@ public class TaskServiceImplTest {
             mDomainUserPublishProcessor.onNext(domainUsers);
             return Completable.complete();
         });
+        when(mTaskRemoteRepositoryWithPublisher.getTaskList()).thenReturn(mDomainTaskPublishProcessor);
     }
 
     @After
@@ -97,12 +101,10 @@ public class TaskServiceImplTest {
 
     @Test
     public void testTaskServiceImplCreationSingleUserWithBadUser() {
-        List<DomainUser> domainUsers = new ArrayList<>();
-        DomainUser domainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.ADDED);
-        domainUser.setLastLoginTime(new Date());
-        domainUsers.add(domainUser);
-        domainUsers.add(new DomainUser("asdaasd", "broken user", DomainUser.Type.ADDED));
+        pushFirebaseUser("adassadadaasdads", "user01", DomainUser.Type.ADDED);
 
+        List<DomainUser> domainUsers = new ArrayList<>();
+        domainUsers.add(new DomainUser("asdaasd", "broken user", DomainUser.Type.ADDED));
         mDomainUserPublishProcessor.onNext(domainUsers);
 
         Single.fromCallable((Callable<Object>) () -> {
@@ -117,15 +119,11 @@ public class TaskServiceImplTest {
 
     @Test
     public void testTaskServiceImplCreationAddAndRemoveUser() {
-        List<DomainUser> domainUsers = new ArrayList<>();
-        DomainUser addedDomainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.ADDED);
-        addedDomainUser.setLastLoginTime(new Date());
-        DomainUser removedDomainUser = new DomainUser("ewrwrsfwewWer32wewe", "user01", DomainUser.Type.REMOVED);
-        removedDomainUser.setLastLoginTime(new Date());
-        domainUsers.add(addedDomainUser);
-        domainUsers.add(removedDomainUser);
+        String userId = "ewrwrsfwewWer32wewe";
+        String displayName = "user01";
 
-        mDomainUserPublishProcessor.onNext(domainUsers);
+        pushFirebaseUser(userId, displayName, DomainUser.Type.ADDED);
+        pushFirebaseUser(userId, displayName, DomainUser.Type.REMOVED);
 
         Single.fromCallable((Callable<Object>) () -> {
                     List<DatabaseUser> databaseUsers = mTaskDao.getUsers().blockingGet();
@@ -142,15 +140,8 @@ public class TaskServiceImplTest {
         String updatedUserId = "sdasdDSda3Adcr3edEwsffr";
         String updatedUserName = "NewUserName";
 
-        List<DomainUser> domainUsers = new ArrayList<>();
-        DomainUser addedDomainUser = new DomainUser(updatedUserId, "user01", DomainUser.Type.ADDED);
-        addedDomainUser.setLastLoginTime(new Date());
-        DomainUser updatedDomainUser = new DomainUser(updatedUserId, updatedUserName, DomainUser.Type.MODIFIED);
-        updatedDomainUser.setLastLoginTime(new Date());
-        domainUsers.add(addedDomainUser);
-        domainUsers.add(updatedDomainUser);
-
-        mDomainUserPublishProcessor.onNext(domainUsers);
+        pushFirebaseUser(updatedUserId, "user01", DomainUser.Type.ADDED);
+        pushFirebaseUser(updatedUserId, updatedUserName, DomainUser.Type.MODIFIED);
 
         Single.fromCallable((Callable<Object>) () -> {
                     DatabaseUser databaseUser = mTaskDao.getUserById(updatedUserId).blockingGet();
@@ -164,19 +155,12 @@ public class TaskServiceImplTest {
     }
 
     @Test
-    public void testUserUpdate(){
-
+    public void testUserUpdate() {
         String updatedUserId = "elkdfk4389jvdsfd43rksdfsd0923i0kd";
         String updatedUserName = "NewUserName";
 
-        List<DomainUser> domainUsers = new ArrayList<>();
-        DomainUser addedDomainUser = new DomainUser(updatedUserId, "user01sdfsfs", DomainUser.Type.ADDED);
-        addedDomainUser.setLastLoginTime(new Date());
-        domainUsers.add(addedDomainUser);
-        mDomainUserPublishProcessor.onNext(domainUsers);
-
+        pushFirebaseUser(updatedUserId, "user01sdfsfs", DomainUser.Type.ADDED);
         DomainUser renamedUsers = new DomainUser(updatedUserId, updatedUserName, null);
-
         mTaskService.updateUser(renamedUsers);
 
         Single.fromCallable((Callable<Object>) () -> {
@@ -188,6 +172,21 @@ public class TaskServiceImplTest {
         )
                 .subscribeOn(Schedulers.io())
                 .subscribe();
+    }
+
+    @Test
+    public void testAddNewTask(){
+        String userId = "sdfmdsfns934kflksdSdfgerSDSfdswwe3";
+        mTaskDao.deleteAllUsers();
+        pushFirebaseUser(userId, "userForTask", DomainUser.Type.ADDED);
+    }
+
+    private void pushFirebaseUser(String updatedUserId, String userName, DomainUser.Type type) {
+        List<DomainUser> domainUsers = new ArrayList<>();
+        DomainUser addedDomainUser = new DomainUser(updatedUserId, userName, type);
+        addedDomainUser.setLastLoginTime(new Date());
+        domainUsers.add(addedDomainUser);
+        mDomainUserPublishProcessor.onNext(domainUsers);
     }
 
     public class TrampolineSchedulerRule implements TestRule {

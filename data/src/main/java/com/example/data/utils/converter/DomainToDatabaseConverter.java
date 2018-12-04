@@ -39,6 +39,7 @@ public final class DomainToDatabaseConverter {
         }
     }
 
+
     public static DatabaseTask convertTask(DomainTask domainTask) {
         if (domainTask != null) {
             DatabaseTask databaseTask = new DatabaseTask();

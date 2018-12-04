@@ -3,6 +3,8 @@ package com.example.data.database;
 import com.example.data.model.DatabaseTask;
 import com.example.data.model.DatabaseUser;
 
+import org.intellij.lang.annotations.Flow;
+
 import java.util.List;
 
 import androidx.room.Dao;
@@ -27,9 +29,18 @@ public interface ITaskDao {
     @Query("SELECT * FROM databaseuser")
     Single<List<DatabaseUser>> getUsers();
 
+    @Query("SELECT * FROM databasetask")
+    Flowable<List<DatabaseTask>> getTasksLive();
+
     @Query("SELECT * FROM databaseuser WHERE userId=:userId")
     Single<DatabaseUser> getUserById(String userId);
 
     @Query("DELETE FROM databaseuser WHERE userId=:userId")
     void deleteUserById(String userId);
+
+    @Query("DELETE FROM databaseuser")
+    void deleteAllUsers();
+
+    @Query("DELETE FROM databasetask WHERE taskId=:taskId")
+    void deleteTaskById(String taskId);
 }

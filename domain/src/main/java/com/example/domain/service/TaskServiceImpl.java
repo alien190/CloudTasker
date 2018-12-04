@@ -19,6 +19,16 @@ public class TaskServiceImpl implements ITaskService {
         mRemoteRepository = remoteRepository;
         mDisposable = new CompositeDisposable();
         refreshUserList();
+        //refreshTaskList();
+    }
+
+    private void refreshTaskList() {
+        mDisposable.add(mRemoteRepository.getTaskList()
+                .doOnError(mRemoteRepository::cleanCacheIfNeed)
+                .flatMap(mLocalRepository::insertTasks)
+                .subscribeOn(Schedulers.io())
+                .subscribe((v) -> {
+                }, Throwable::printStackTrace));
     }
 
     private void refreshUserList() {

@@ -6,6 +6,7 @@ import android.content.Context;
 import com.example.data.model.FirebaseUser;
 import com.example.data.utils.converter.DomainToFirebaseConverter;
 import com.example.data.utils.converter.FireBaseToDomainConverter;
+import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 import com.google.firebase.firestore.DocumentChange;
@@ -85,6 +86,31 @@ public class TaskRemoteRepository implements ITaskRepository {
     @Override
     public Flowable<Boolean> insertUsers(List<DomainUser> users) {
         return Flowable.error(getError());
+    }
+
+    @Override
+    public Flowable<Boolean> insertTasks(List<DomainTask> domainTasks) {
+        return null;
+    }
+
+    @Override
+    public Flowable<List<DomainTask>> getTaskList() {
+        Query query = mDatabase.collection(TASK_COLLECTION_NAME);
+        return RxFirestore.observeQueryRef(query).map(this::mapTask);
+    }
+
+    private List<DomainTask> mapTask(QuerySnapshot queryDocumentSnapshots) {
+        List<DomainTask> tasks = new ArrayList<>();
+        if (queryDocumentSnapshots != null && !queryDocumentSnapshots.getMetadata().hasPendingWrites())
+            if (!queryDocumentSnapshots.isEmpty()) {
+                for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
+                    DomainTask task = FireBaseToDomainConverter.convertTask(documentChange);
+                    if (task != null && task.getTaskId() != null && !task.getTaskId().isEmpty()) {
+                        tasks.add(task);
+                    }
+                }
+            }
+        return tasks;
     }
 
     private Throwable getError() {

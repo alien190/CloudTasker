@@ -1,7 +1,9 @@
 package com.example.data.repository;
 
 import com.example.data.database.ITaskDao;
+import com.example.data.utils.converter.DatabaseToDomainConverter;
 import com.example.data.utils.converter.DomainToDatabaseConverter;
+import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 
@@ -9,6 +11,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.schedulers.Schedulers;
 
 public class TaskLocalRepository implements ITaskRepository {
     private ITaskDao mTaskDao;
@@ -63,20 +66,20 @@ public class TaskLocalRepository implements ITaskRepository {
     }
 
     @Override
-    public Flowable<Boolean> insertTasks(List<DomainTask> ) {
+    public Flowable<Boolean> insertTasks(List<DomainTask> domainTasks) {
         return Flowable.fromCallable(() -> {
-            for (DomainUser user : users) {
-                switch (user.getType()) {
+            for (DomainTask task : domainTasks) {
+                switch (task.getType()) {
                     case ADDED: {
-                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                        mTaskDao.insertTask(DomainToDatabaseConverter.convertTask(task));
                         break;
                     }
                     case MODIFIED: {
-                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                        mTaskDao.insertTask(DomainToDatabaseConverter.convertTask(task));
                         break;
                     }
                     case REMOVED: {
-                        mTaskDao.deleteUserById(user.getUserId());
+                        mTaskDao.deleteTaskById(task.getTaskId());
                         break;
                     }
                     default: {
@@ -86,6 +89,11 @@ public class TaskLocalRepository implements ITaskRepository {
             }
             return true;
         });
+    }
+
+    @Override
+    public Flowable<List<DomainTask>> getTaskList() {
+        return mTaskDao.getTasksLive().map(DatabaseToDomainConverter::convertTasks).subscribeOn(Schedulers.io());
     }
 
     private Throwable getError() {

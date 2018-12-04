@@ -1,5 +1,6 @@
 package com.example.domain.repository;
 
+import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 
 import java.util.List;
@@ -18,4 +19,8 @@ public interface ITaskRepository {
     Completable updateUser(DomainUser user);
 
     Flowable<Boolean> insertUsers(List<DomainUser> users);
+
+    Flowable<Boolean> insertTasks(List<DomainTask> domainTasks);
+
+    Flowable<List<DomainTask>> getTaskList();
 }
