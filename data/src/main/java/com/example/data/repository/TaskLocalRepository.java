@@ -26,7 +26,9 @@ public class TaskLocalRepository implements ITaskRepository {
 
     @Override
     public Flowable<List<DomainUser>> getUserList() {
-        return null;
+        return mTaskDao.getUsersLive()
+                .map(DatabaseToDomainConverter::convertUsers)
+                .subscribeOn(Schedulers.io());
     }
 
     @Override
@@ -36,6 +38,11 @@ public class TaskLocalRepository implements ITaskRepository {
 
     @Override
     public Completable updateUser(DomainUser user) {
+        return Completable.error(getError());
+    }
+
+    @Override
+    public Completable updateTask(DomainTask task) {
         return Completable.error(getError());
     }
 
@@ -62,7 +69,7 @@ public class TaskLocalRepository implements ITaskRepository {
                 }
             }
             return true;
-        });
+        }).subscribeOn(Schedulers.io());
     }
 
     @Override
@@ -88,7 +95,7 @@ public class TaskLocalRepository implements ITaskRepository {
                 }
             }
             return true;
-        });
+        }).subscribeOn(Schedulers.io());
     }
 
     @Override

@@ -52,6 +52,17 @@ public class TaskServiceImpl implements ITaskService {
     }
 
     @Override
+    public Completable updateTask(DomainTask task) {
+        return mRemoteRepository.updateTask(task)
+                .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Flowable<List<DomainUser>> getUserList() {
+        return mLocalRepository.getUserList();
+    }
+
+    @Override
     public Flowable<List<DomainTask>> getTaskList() {
         return mLocalRepository.getTaskList();
     }

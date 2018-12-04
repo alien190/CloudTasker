@@ -27,6 +27,9 @@ public interface ITaskDao {
     @Query("SELECT * FROM databaseuser")
     Single<List<DatabaseUser>> getUsers();
 
+    @Query("SELECT * FROM databaseuser")
+    Flowable<List<DatabaseUser>> getUsersLive();
+
     @Query("SELECT * FROM databasetask")
     Flowable<List<DatabaseTask>> getTasksLive();
 

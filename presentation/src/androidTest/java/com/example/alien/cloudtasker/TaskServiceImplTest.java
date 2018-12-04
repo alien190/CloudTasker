@@ -93,6 +93,15 @@ public class TaskServiceImplTest {
             return Completable.complete();
         });
         when(mTaskRemoteRepositoryWithPublisher.getTaskList()).thenReturn(mDomainTaskPublishProcessor);
+        when(mTaskRemoteRepositoryWithPublisher.updateTask(any())).thenAnswer((Answer<Completable>) invocation -> {
+            Object[] args = invocation.getArguments();
+            DomainTask domainTask = (DomainTask) args[0];
+            domainTask.setType(DomainTask.Type.MODIFIED);
+            List<DomainTask> domainTasks = new ArrayList<>();
+            domainTasks.add(domainTask);
+            mDomainTaskPublishProcessor.onNext(domainTasks);
+            return Completable.complete();
+        });
     }
 
     @After
@@ -160,6 +169,57 @@ public class TaskServiceImplTest {
                     assertEquals(updatedUserId, databaseUser.getUserId());
                     assertEquals(updatedUserName, databaseUser.getUserName());
                 });
+    }
+
+    @Test
+    public void testUserListLive() {
+        String userId = "ewrwrsfwewWer32wewe";
+        String displayName = "user01";
+        String newDisplayName = "user010101";
+
+        int count[] = new int[1];
+        count[0] = -1;
+
+        mTaskService.getUserList()
+                .observeOn(Schedulers.io())
+                .subscribe(users -> {
+                    switch (count[0]) {
+                        case 0: {
+                            assertEquals(1, users.size());
+                            break;
+                        }
+                        case 1: {
+                            assertEquals(0, users.size());
+                            break;
+                        }
+                        case 2: {
+                            assertEquals(1, users.size());
+                            break;
+                        }
+                        case 3: {
+                            assertEquals(1, users.size());
+                            assertEquals(newDisplayName, users.get(0).getDisplayName());
+                            break;
+                        }
+                    }
+                    Timber.d("testUserListLive, count: %d", count[0]);
+                });
+
+        pushFirebaseUser(userId, displayName, DomainUser.Type.ADDED);
+        count[0]++;
+        sleepOneSecond();
+
+        pushFirebaseUser(userId, displayName, DomainUser.Type.REMOVED);
+        count[0]++;
+        sleepOneSecond();
+
+        pushFirebaseUser(userId, displayName, DomainUser.Type.ADDED);
+        count[0]++;
+        sleepOneSecond();
+
+        pushFirebaseUser(userId, newDisplayName, DomainUser.Type.MODIFIED);
+        count[0]++;
+        sleepOneSecond();
     }
 
     @Test
@@ -324,16 +384,27 @@ public class TaskServiceImplTest {
                         }
                     }
                     Timber.d("testRemoveTask, count: %d", count[0]);
-                    count[0]++;
                 });
 
         pushFirebaseTask(taskOneId, authorUserId, executorUserId, taskTitle, taskText, DomainTask.Type.ADDED);
         sleepOneSecond();
+
+        count[0]++;
         pushFirebaseTask(taskTwoId, authorUserId, executorUserId, taskTitle, taskText, DomainTask.Type.ADDED);
         sleepOneSecond();
+
+        count[0]++;
         pushFirebaseTask(taskOneId, authorUserId, executorUserId, taskTitle, taskText, DomainTask.Type.REMOVED);
         sleepOneSecond();
-        pushFirebaseTask(taskTwoId, authorUserId, executorUserId, newTaskTitle, newTaskText, DomainTask.Type.MODIFIED);
+
+        count[0]++;
+        DomainTask domainTask = new DomainTask();
+        domainTask.setTaskId(taskTwoId);
+        domainTask.setAuthorId(authorUserId);
+        domainTask.setExecutorId(executorUserId);
+        domainTask.setTitle(newTaskTitle);
+        domainTask.setText(taskText);
+        mTaskService.updateTask(domainTask);
         sleepOneSecond();
     }
 

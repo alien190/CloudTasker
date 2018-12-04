@@ -3,6 +3,7 @@ package com.example.data.repository;
 import android.app.ActivityManager;
 import android.content.Context;
 
+import com.example.data.model.FirebaseTask;
 import com.example.data.model.FirebaseUser;
 import com.example.data.utils.converter.DomainToFirebaseConverter;
 import com.example.data.utils.converter.FireBaseToDomainConverter;
@@ -111,6 +112,17 @@ public class TaskRemoteRepository implements ITaskRepository {
                 }
             }
         return tasks;
+    }
+
+    @Override
+    public Completable updateTask(DomainTask task) {
+        if (task != null) {
+            DocumentReference reference = mDatabase.collection(TASK_COLLECTION_NAME).document(task.getTaskId());
+            FirebaseTask firebaseTask = DomainToFirebaseConverter.convertTask(task);
+            return RxFirestore.setDocument(reference, firebaseTask);
+        } else {
+            return Completable.error(new IllegalArgumentException("task can't be null"));
+        }
     }
 
     private Throwable getError() {
