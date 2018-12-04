@@ -62,6 +62,32 @@ public class TaskLocalRepository implements ITaskRepository {
         });
     }
 
+    @Override
+    public Flowable<Boolean> insertTasks(List<DomainTask> ) {
+        return Flowable.fromCallable(() -> {
+            for (DomainUser user : users) {
+                switch (user.getType()) {
+                    case ADDED: {
+                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                        break;
+                    }
+                    case MODIFIED: {
+                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                        break;
+                    }
+                    case REMOVED: {
+                        mTaskDao.deleteUserById(user.getUserId());
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
+            return true;
+        });
+    }
+
     private Throwable getError() {
         return new Throwable("do nothing");
     }

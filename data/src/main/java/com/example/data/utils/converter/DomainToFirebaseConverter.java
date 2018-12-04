@@ -1,6 +1,8 @@
 package com.example.data.utils.converter;
 
+import com.example.data.model.FirebaseTask;
 import com.example.data.model.FirebaseUser;
+import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 
 public final class DomainToFirebaseConverter {
@@ -11,6 +13,20 @@ public final class DomainToFirebaseConverter {
             return firebaseUser;
         } else {
             throw new IllegalArgumentException("domainUser can't be null");
+        }
+    }
+
+    public static FirebaseTask convertTask(DomainTask domainTask) {
+        if (domainTask != null) {
+            FirebaseTask firebaseTask = new FirebaseTask();
+            firebaseTask.setTaskId(domainTask.getTaskId());
+            firebaseTask.setAuthorId(domainTask.getAuthorId());
+            firebaseTask.setExecutorId(domainTask.getExecutorId());
+            firebaseTask.setText(domainTask.getText());
+            firebaseTask.setTitle(domainTask.getTitle());
+            return firebaseTask;
+        } else {
+            throw new IllegalArgumentException("domainTask can't be null");
         }
     }
 }
