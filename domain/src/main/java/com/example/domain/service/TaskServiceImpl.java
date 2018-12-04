@@ -4,7 +4,6 @@ import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 
 import io.reactivex.Completable;
-import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
 

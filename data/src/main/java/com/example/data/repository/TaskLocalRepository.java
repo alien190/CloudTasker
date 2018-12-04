@@ -9,7 +9,6 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.schedulers.Schedulers;
 
 public class TaskLocalRepository implements ITaskRepository {
     private ITaskDao mTaskDao;
@@ -40,9 +39,27 @@ public class TaskLocalRepository implements ITaskRepository {
     @Override
     public Flowable<Boolean> insertUsers(List<DomainUser> users) {
         return Flowable.fromCallable(() -> {
-            mTaskDao.insertUsers(DomainToDatabaseConverter.convertUsers(users));
+            for (DomainUser user : users) {
+                switch (user.getType()) {
+                    case ADDED: {
+                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                        break;
+                    }
+                    case MODIFIED: {
+                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                        break;
+                    }
+                    case REMOVED: {
+                        mTaskDao.deleteUserById(user.getUserId());
+                        break;
+                    }
+                    default: {
+                        break;
+                    }
+                }
+            }
             return true;
-        }).subscribeOn(Schedulers.io());
+        });
     }
 
     private Throwable getError() {

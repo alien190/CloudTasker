@@ -2,22 +2,18 @@ package com.example.data.repository;
 
 import android.app.ActivityManager;
 import android.content.Context;
-import android.widget.Toast;
 
-import com.example.data.R;
 import com.example.data.model.FirebaseUser;
 import com.example.data.utils.converter.DomainToFirebaseConverter;
 import com.example.data.utils.converter.FireBaseToDomainConverter;
 import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QuerySnapshot;
-import com.google.firebase.firestore.SetOptions;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,8 +21,6 @@ import java.util.List;
 import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.annotations.NonNull;
 import timber.log.Timber;
 
 import static android.content.Context.ACTIVITY_SERVICE;
@@ -48,10 +42,7 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     @Override
     public Flowable<List<DomainUser>> getUserList() {
-        //CollectionReference collectionReference = mDatabase.collection(USER_COLLECTION_NAME);
-        //return RxFirestore.getCollection(collectionReference).map(this::mapUser);
         Query query = mDatabase.collection(USER_COLLECTION_NAME);
-
         return RxFirestore.observeQueryRef(query).map(this::mapUser);
     }
 
@@ -74,7 +65,6 @@ public class TaskRemoteRepository implements ITaskRepository {
         try {
             if (throwable instanceof FirebaseFirestoreException &&
                     ((FirebaseFirestoreException) throwable).getCode().name().equals("PERMISSION_DENIED"))
-                //Toast.makeText(mContext, mContext.getString(R.string.clen_cache), Toast.LENGTH_LONG).show();
                 ((ActivityManager) mContext.getSystemService(ACTIVITY_SERVICE)).clearApplicationUserData();
         } catch (Throwable t) {
             Timber.d(t);
