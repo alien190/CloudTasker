@@ -22,6 +22,7 @@ import java.util.List;
 
 import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
+import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
 import timber.log.Timber;
 
@@ -85,13 +86,21 @@ public class TaskRemoteRepository implements ITaskRepository {
     }
 
     @Override
-    public Flowable<Boolean> insertUsers(List<DomainUser> users) {
-        return Flowable.error(getError());
+    public Completable insertUsers(List<DomainUser> users) {
+        return Completable.error(getError());
     }
 
     @Override
-    public Flowable<Boolean> insertTasks(List<DomainTask> domainTasks) {
-        return null;
+    public Completable insertTasks(List<DomainTask> domainTasks) {
+        if (domainTasks != null) {
+            CompletableSource[] completableList = new CompletableSource[domainTasks.size()];
+            for (int i = 0; i < domainTasks.size() - 1; i++) {
+                completableList[i] = updateTask(domainTasks.get(i));
+            }
+            return Completable.concatArray(completableList);
+        } else {
+            return Completable.error(new Throwable("domainTasks can't be null"));
+        }
     }
 
     @Override

@@ -4,11 +4,14 @@ import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 
+import org.reactivestreams.Publisher;
+
 import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 
 public class TaskServiceImpl implements ITaskService {
@@ -29,7 +32,7 @@ public class TaskServiceImpl implements ITaskService {
     private void refreshTaskList() {
         mDisposable.add(mRemoteRepository.getTaskList()
                 .doOnError(mRemoteRepository::cleanCacheIfNeed)
-                .flatMap(mLocalRepository::insertTasks)
+                .flatMap(domainTasks -> mLocalRepository.insertTasks(domainTasks).toFlowable())
                 .subscribeOn(Schedulers.io())
                 .subscribe((v) -> {
                 }, Throwable::printStackTrace));
@@ -38,7 +41,7 @@ public class TaskServiceImpl implements ITaskService {
     private void refreshUserList() {
         mDisposable.add(mRemoteRepository.getUserList()
                 .doOnError(mRemoteRepository::cleanCacheIfNeed)
-                .flatMap(mLocalRepository::insertUsers)
+                .flatMap(domainUsers -> mLocalRepository.insertUsers(domainUsers).toFlowable())
                 .subscribeOn(Schedulers.io())
                 .subscribe((v) -> {
                 }, Throwable::printStackTrace));

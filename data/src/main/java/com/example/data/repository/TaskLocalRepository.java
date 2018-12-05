@@ -47,8 +47,8 @@ public class TaskLocalRepository implements ITaskRepository {
     }
 
     @Override
-    public Flowable<Boolean> insertUsers(List<DomainUser> users) {
-        return Flowable.fromCallable(() -> {
+    public Completable insertUsers(List<DomainUser> users) {
+        return Completable.fromRunnable(() -> {
             for (DomainUser user : users) {
                 switch (user.getType()) {
                     case ADDED: {
@@ -68,13 +68,12 @@ public class TaskLocalRepository implements ITaskRepository {
                     }
                 }
             }
-            return true;
         }).subscribeOn(Schedulers.io());
     }
 
     @Override
-    public Flowable<Boolean> insertTasks(List<DomainTask> domainTasks) {
-        return Flowable.fromCallable(() -> {
+    public Completable insertTasks(List<DomainTask> domainTasks) {
+        return Completable.fromRunnable(() -> {
             for (DomainTask task : domainTasks) {
                 switch (task.getType()) {
                     case ADDED: {
@@ -94,7 +93,6 @@ public class TaskLocalRepository implements ITaskRepository {
                     }
                 }
             }
-            return true;
         }).subscribeOn(Schedulers.io());
     }
 

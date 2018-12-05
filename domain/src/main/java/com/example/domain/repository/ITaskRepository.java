@@ -18,9 +18,9 @@ public interface ITaskRepository {
 
     Completable updateUser(DomainUser user);
 
-    Flowable<Boolean> insertUsers(List<DomainUser> users);
+    Completable insertUsers(List<DomainUser> users);
 
-    Flowable<Boolean> insertTasks(List<DomainTask> domainTasks);
+    Completable insertTasks(List<DomainTask> domainTasks);
 
     Flowable<List<DomainTask>> getTaskList();
 
