@@ -16,6 +16,7 @@ public class TaskListViewModel extends ViewModel implements ITaskListViewModel {
     private CompositeDisposable mDisposable = new CompositeDisposable();
 
     private MutableLiveData<List<DomainTask>> mTaskList = new MutableLiveData<>();
+    private MutableLiveData<String> mTaskDetailId = new MutableLiveData<>();
 
     public TaskListViewModel(ITaskService taskService) {
         mTaskService = taskService;
@@ -41,5 +42,15 @@ public class TaskListViewModel extends ViewModel implements ITaskListViewModel {
     @Override
     public MutableLiveData<List<DomainTask>> getTaskList() {
         return mTaskList;
+    }
+
+    @Override
+    public MutableLiveData<String> getTaskDetailId() {
+        return mTaskDetailId;
+    }
+
+    @Override
+    public void showTaskDetail(String taskId) {
+        mTaskDetailId.postValue(taskId);
     }
 }

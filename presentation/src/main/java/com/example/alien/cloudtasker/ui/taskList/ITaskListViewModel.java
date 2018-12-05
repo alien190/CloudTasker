@@ -8,4 +8,8 @@ import androidx.lifecycle.MutableLiveData;
 
 public interface ITaskListViewModel {
     MutableLiveData<List<DomainTask>> getTaskList();
+
+    MutableLiveData<String> getTaskDetailId();
+
+    void showTaskDetail(String taskId);
 }

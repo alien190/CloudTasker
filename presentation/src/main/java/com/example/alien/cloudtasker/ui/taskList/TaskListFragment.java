@@ -5,16 +5,24 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.example.alien.cloudtasker.R;
 import com.example.alien.cloudtasker.databinding.TaskListBinding;
+import com.example.alien.cloudtasker.ui.taskDetail.TaskDetailFragment;
+
+import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
 public class TaskListFragment extends Fragment {
     private static final String SCOPE_NAME_KEY = "TaskListFragment.ScopeName";
+
+    @Inject
+    ITaskListViewModel mViewModel;
 
     public static TaskListFragment newInstance(String scopeName) {
 
@@ -35,11 +43,26 @@ public class TaskListFragment extends Fragment {
                 TaskListBinding taskListBinding = TaskListBinding.inflate(inflater);
                 taskListBinding.setScopeName(scopeName);
                 Scope scope = Toothpick.openScope(scopeName);
-                taskListBinding.setVm(scope.getInstance(ITaskListViewModel.class));
+                Toothpick.inject(this, scope);
+                mViewModel.getTaskDetailId().observe(this, this::showTaskDetail);
+                taskListBinding.setVm(mViewModel);
                 taskListBinding.setLifecycleOwner(this);
                 return taskListBinding.getRoot();
             }
         }
-        throw new IllegalArgumentException("scopeName can't be null ir empty");
+        throw new IllegalArgumentException("scopeName can't be null or empty");
+    }
+
+    private void showTaskDetail(String taskId) {
+        if (taskId != null) {
+            FragmentManager fragmentManager = getFragmentManager();
+            if (fragmentManager != null) {
+                fragmentManager.beginTransaction()
+                        .replace(R.id.fragmentContainer, TaskDetailFragment.newInstance())
+                        .addToBackStack(TaskDetailFragment.class.getSimpleName())
+                        .commit();
+            }
+            mViewModel.getTaskDetailId().setValue(null);
+        }
     }
 }
