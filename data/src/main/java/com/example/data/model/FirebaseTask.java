@@ -6,17 +6,12 @@ public class FirebaseTask {
     private String executorId;
     private String title;
     private String text;
+    private boolean isComplete;
+
 
     public FirebaseTask() {
     }
 
-    public FirebaseTask(String taskId, String authorId, String executorId, String title, String text) {
-        this.taskId = taskId;
-        this.authorId = authorId;
-        this.executorId = executorId;
-        this.title = title;
-        this.text = text;
-    }
 
     public String getTaskId() {
         return taskId;
@@ -56,5 +51,13 @@ public class FirebaseTask {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public boolean getIsComplete() {
+        return isComplete;
+    }
+
+    public void setIsComplete(boolean complete) {
+        isComplete = complete;
     }
 }

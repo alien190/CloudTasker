@@ -49,6 +49,7 @@ public final class DatabaseToDomainConverter {
             domainTask.setExecutorId(databaseTask.getExecutorId());
             domainTask.setText(databaseTask.getText());
             domainTask.setTitle(databaseTask.getTitle());
+            domainTask.setComplete(databaseTask.isComplete());
             return domainTask;
         } else {
             throw new IllegalArgumentException("databaseTask can't be null");

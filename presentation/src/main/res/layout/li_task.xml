@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_margin="@dimen/margin"
     android:elevation="@dimen/elevation"
     android:orientation="vertical">
@@ -10,22 +10,36 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:layout_margin="@dimen/margin">
+        android:layout_margin="@dimen/margin"
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/tv_title"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:text="Title Title Title Title Title Title Title Title Title Title Title Title Title"
-            android:layout_marginBottom="@dimen/margin"
-            style="@style/TaskCaption" />
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_check_black_24dp"
+                android:id="@+id/iv_complete"/>
+
+            <TextView
+                android:id="@+id/tv_title"
+                style="@style/TaskCaption"
+                android:layout_width="0dp"
+                android:layout_weight="1"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="@dimen/margin"
+                tools:text="Title Title Title Title Title Title Title Title Title Title Title Title Title" />
+
+        </LinearLayout>
 
         <TextView
             android:id="@+id/tv_text"
+            style="@style/TaskText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            tools:text="text text text text tex text text text text text tex text text text text text tex text text text text text tex text text text text text tex text "
-            style="@style/TaskText" />
+            tools:text="text text text text tex text text text text text tex text text text text text tex text text text text text tex text text text text text tex text " />
     </LinearLayout>
 </androidx.cardview.widget.CardView>

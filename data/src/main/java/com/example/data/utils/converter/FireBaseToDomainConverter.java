@@ -33,6 +33,7 @@ public final class FireBaseToDomainConverter {
             domainTask.setExecutorId(firebaseTask.getExecutorId());
             domainTask.setTitle(firebaseTask.getTitle());
             domainTask.setText(firebaseTask.getText());
+            domainTask.setComplete(firebaseTask.getIsComplete());
             domainTask.setType(DomainTask.Type.valueOf(documentChange.getType().name()));
         } catch (Throwable throwable) {
             Timber.d(throwable);

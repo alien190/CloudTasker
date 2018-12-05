@@ -9,6 +9,7 @@ public class DomainTask {
     private Type type;
     private String authorName;
     private String executorName;
+    private boolean isComplete;
 
     public DomainTask() {
     }
@@ -78,6 +79,14 @@ public class DomainTask {
         this.executorName = executorName;
     }
 
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(boolean complete) {
+        isComplete = complete;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (o instanceof DomainTask) {
@@ -88,7 +97,8 @@ public class DomainTask {
                     && authorName != null && authorName.equals(task.authorName)
                     && executorName != null && executorName.equals(task.executorName)
                     && title != null && title.equals(task.title)
-                    && text != null && text.equals(task.text);
+                    && text != null && text.equals(task.text)
+                    && isComplete == task.isComplete;
         }
         return false;
     }

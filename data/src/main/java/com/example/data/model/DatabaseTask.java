@@ -26,6 +26,7 @@ public class DatabaseTask {
     private String executorId;
     private String title;
     private String text;
+    private boolean isComplete;
 
     public DatabaseTask() {
     }
@@ -69,5 +70,13 @@ public class DatabaseTask {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    public boolean isComplete() {
+        return isComplete;
+    }
+
+    public void setComplete(boolean complete) {
+        isComplete = complete;
     }
 }

@@ -24,6 +24,7 @@ public final class DomainToFirebaseConverter {
             firebaseTask.setExecutorId(domainTask.getExecutorId());
             firebaseTask.setText(domainTask.getText());
             firebaseTask.setTitle(domainTask.getTitle());
+            firebaseTask.setIsComplete(domainTask.isComplete());
             return firebaseTask;
         } else {
             throw new IllegalArgumentException("domainTask can't be null");
