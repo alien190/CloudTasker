@@ -3,8 +3,6 @@ package com.example.alien.cloudtasker;
 import android.app.Application;
 
 import com.example.alien.cloudtasker.di.application.ApplicationModule;
-import com.example.alien.cloudtasker.di.application.DatabaseModule;
-import com.example.alien.cloudtasker.di.application.NetworkModule;
 import com.facebook.stetho.Stetho;
 
 import timber.log.Timber;
@@ -22,8 +20,6 @@ public class App extends Application {
         Stetho.initializeWithDefaults(this);
 
         Scope scope = Toothpick.openScope("Application");
-        scope.installModules(new ApplicationModule(getApplicationContext()),
-                new NetworkModule(getApplicationContext()),
-                new DatabaseModule(getApplicationContext()));
+        scope.installModules(new ApplicationModule(getApplicationContext()));
     }
 }

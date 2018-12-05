@@ -1,13 +1,14 @@
 package com.example.alien.cloudtasker;
 
-import android.app.ActivityManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.alien.cloudtasker.di.taskService.DatabaseModule;
+import com.example.alien.cloudtasker.di.taskService.NetworkModule;
+import com.example.alien.cloudtasker.di.taskService.TaskServiceModule;
 import com.example.alien.cloudtasker.di.usersViewModel.UserViewModelModule;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
@@ -28,13 +29,17 @@ public class SecondActivity extends SingleFragmentActivity {
         if (user == null) {
             AuthActivity.start(this);
             finish();
+        } else {
+            Scope scope = Toothpick.openScopes("Application", "TaskService");
+            scope.installModules(new TaskServiceModule(user.getUid()),
+                    new NetworkModule(),
+                    new DatabaseModule());
         }
-       // clearCache();
     }
 
     @Override
     protected Fragment getFragment() {
-        Scope scope = Toothpick.openScopes("Application", "SecondActivity");
+        Scope scope = Toothpick.openScopes("TaskService", "SecondActivity");
         scope.installModules(new UserViewModelModule(this));
         return TestFragment.newInstance();
     }
@@ -79,15 +84,5 @@ public class SecondActivity extends SingleFragmentActivity {
                     AuthActivity.start(context);
                     finish();
                 });
-    }
-
-    public void clearCache(){
-        if (Build.VERSION_CODES.KITKAT <= Build.VERSION.SDK_INT) {
-            ((ActivityManager)getApplicationContext().getSystemService(ACTIVITY_SERVICE))
-                    .clearApplicationUserData(); // note: it has a return value!
-        } else {
-            // use old hacky way, which can be removed
-            // once minSdkVersion goes above 19 in a few years.
-        }
     }
 }

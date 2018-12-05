@@ -33,13 +33,15 @@ public class TaskRemoteRepository implements ITaskRepository {
     private static final String TASK_COLLECTION_NAME = "tasks";
     private FirebaseFirestore mDatabase;
     private Context mContext;
+    private String mUserId;
 
-    public TaskRemoteRepository(FirebaseFirestore database, Context context) {
-        if (database != null && context != null) {
+    public TaskRemoteRepository(FirebaseFirestore database, Context context, String userId) {
+        if (database != null && context != null && userId != null && !userId.isEmpty()) {
             mDatabase = database;
             mContext = context;
+            mUserId = userId;
         } else {
-            throw new IllegalArgumentException("database && context can't be null");
+            throw new IllegalArgumentException("database && context && userId can't be null or empty");
         }
     }
 
@@ -105,8 +107,10 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     @Override
     public Flowable<List<DomainTask>> getTaskList() {
-        Query query = mDatabase.collection(TASK_COLLECTION_NAME);
-        return RxFirestore.observeQueryRef(query).map(this::mapTask);
+        Query queryAuthor = mDatabase.collection(TASK_COLLECTION_NAME).whereEqualTo("authorId", mUserId);
+        Query queryExecutor = mDatabase.collection(TASK_COLLECTION_NAME).whereEqualTo("executorId", mUserId);
+        return RxFirestore.observeQueryRef(queryAuthor).map(this::mapTask)
+                .mergeWith(RxFirestore.observeQueryRef(queryExecutor).map(this::mapTask));
     }
 
     private List<DomainTask> mapTask(QuerySnapshot queryDocumentSnapshots) {

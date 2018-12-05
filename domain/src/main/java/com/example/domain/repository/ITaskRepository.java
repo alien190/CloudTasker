@@ -11,6 +11,7 @@ import io.reactivex.Flowable;
 public interface ITaskRepository {
     String REMOTE = "REMOTE";
     String LOCAL = "LOCAL";
+    String USER_ID = "USER_ID";
 
     Flowable<List<DomainUser>> getUserList();
 

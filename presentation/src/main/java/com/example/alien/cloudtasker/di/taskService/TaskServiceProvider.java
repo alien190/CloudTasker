@@ -1,4 +1,4 @@
-package com.example.alien.cloudtasker.di.application;
+package com.example.alien.cloudtasker.di.taskService;
 
 import com.example.domain.repository.ITaskRepository;
 import com.example.domain.service.ITaskService;

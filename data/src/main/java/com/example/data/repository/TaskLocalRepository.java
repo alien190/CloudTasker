@@ -12,15 +12,18 @@ import java.util.List;
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.schedulers.Schedulers;
+import timber.log.Timber;
 
 public class TaskLocalRepository implements ITaskRepository {
     private ITaskDao mTaskDao;
+    private String mUserId;
 
-    public TaskLocalRepository(ITaskDao taskDao) {
-        if (taskDao != null) {
+    public TaskLocalRepository(ITaskDao taskDao, String userId) {
+        if (taskDao != null && userId != null && !userId.isEmpty()) {
             mTaskDao = taskDao;
+            mUserId = userId;
         } else {
-            throw new IllegalArgumentException("taskDao can't be null");
+            throw new IllegalArgumentException("taskDao && userId can't be null or empty");
         }
     }
 
@@ -50,22 +53,26 @@ public class TaskLocalRepository implements ITaskRepository {
     public Completable insertUsers(List<DomainUser> users) {
         return Completable.fromRunnable(() -> {
             for (DomainUser user : users) {
-                switch (user.getType()) {
-                    case ADDED: {
-                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
-                        break;
+                try {
+                    switch (user.getType()) {
+                        case ADDED: {
+                            mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                            break;
+                        }
+                        case MODIFIED: {
+                            mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
+                            break;
+                        }
+                        case REMOVED: {
+                            mTaskDao.deleteUserById(user.getUserId());
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
                     }
-                    case MODIFIED: {
-                        mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
-                        break;
-                    }
-                    case REMOVED: {
-                        mTaskDao.deleteUserById(user.getUserId());
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
+                } catch (Throwable throwable) {
+                    Timber.d(throwable);
                 }
             }
         }).subscribeOn(Schedulers.io());
@@ -75,22 +82,26 @@ public class TaskLocalRepository implements ITaskRepository {
     public Completable insertTasks(List<DomainTask> domainTasks) {
         return Completable.fromRunnable(() -> {
             for (DomainTask task : domainTasks) {
-                switch (task.getType()) {
-                    case ADDED: {
-                        mTaskDao.insertTask(DomainToDatabaseConverter.convertTask(task));
-                        break;
+                try {
+                    switch (task.getType()) {
+                        case ADDED: {
+                            mTaskDao.insertTask(DomainToDatabaseConverter.convertTask(task));
+                            break;
+                        }
+                        case MODIFIED: {
+                            mTaskDao.insertTask(DomainToDatabaseConverter.convertTask(task));
+                            break;
+                        }
+                        case REMOVED: {
+                            mTaskDao.deleteTaskById(task.getTaskId());
+                            break;
+                        }
+                        default: {
+                            break;
+                        }
                     }
-                    case MODIFIED: {
-                        mTaskDao.insertTask(DomainToDatabaseConverter.convertTask(task));
-                        break;
-                    }
-                    case REMOVED: {
-                        mTaskDao.deleteTaskById(task.getTaskId());
-                        break;
-                    }
-                    default: {
-                        break;
-                    }
+                } catch (Throwable throwable) {
+                    Timber.d(throwable);
                 }
             }
         }).subscribeOn(Schedulers.io());
@@ -98,7 +109,7 @@ public class TaskLocalRepository implements ITaskRepository {
 
     @Override
     public Flowable<List<DomainTask>> getTaskList() {
-        return mTaskDao.getTasksWithUsersLive()
+        return mTaskDao.getTasksWithUsersLive(mUserId)
                 .map(DatabaseToDomainConverter::convertTasksWithUsers)
                 .subscribeOn(Schedulers.io());
     }

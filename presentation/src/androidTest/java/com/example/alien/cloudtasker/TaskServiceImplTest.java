@@ -64,12 +64,14 @@ public class TaskServiceImplTest {
     @Rule
     public TrampolineSchedulerRule mTrampolineSchedulerRule = new TrampolineSchedulerRule();
 
+    private static final String mUserId = "asddjSDwesdSDSDw23ws";
+
     @Before
     public void setUp() throws Exception {
         Context context = InstrumentationRegistry.getInstrumentation().getContext();
         mTaskDatabase = Room.inMemoryDatabaseBuilder(context, TaskDatabase.class).build();
         mTaskDao = mTaskDatabase.getTaskDao();
-        mTaskLocalRepository = new TaskLocalRepository(mTaskDao);
+        mTaskLocalRepository = new TaskLocalRepository(mTaskDao, mUserId);
         initPublishProcessors();
         initTaskRemoteRepositoryWithPublisher();
         mTaskService = new TaskServiceImpl(mTaskLocalRepository, mTaskRemoteRepositoryWithPublisher);
@@ -224,7 +226,7 @@ public class TaskServiceImplTest {
 
     @Test
     public void testAddNewTask() {
-        String authorUserId = "sdfmdsfns934kflksdSdfgerSDSfdswwe3";
+        String authorUserId = mUserId;
         String executorUserId = "fldsk304rwwesfd4wr23edea";
         String taskId = "taskId";
         String taskTitle = "Task title";

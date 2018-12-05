@@ -51,6 +51,7 @@ public interface ITaskDao {
     @Query("SELECT databasetask.*, authorName, executorName " +
             "FROM databasetask " +
             "JOIN (SELECT userId, userName AS authorName FROM databaseuser) AS authors ON databasetask.authorId=authors.userId " +
-            "JOIN (SELECT userId, userName AS executorName FROM databaseuser) AS executors ON databasetask.executorId=executors.userId")
-    Flowable<List<DatabaseTaskWithUsers>> getTasksWithUsersLive();
+            "JOIN (SELECT userId, userName AS executorName FROM databaseuser) AS executors ON databasetask.executorId=executors.userId " +
+            "WHERE databasetask.authorId =:userId OR databasetask.executorId=:userId")
+    Flowable<List<DatabaseTaskWithUsers>> getTasksWithUsersLive(String userId);
 }
