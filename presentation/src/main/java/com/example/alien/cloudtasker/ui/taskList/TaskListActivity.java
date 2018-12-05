@@ -1,4 +1,4 @@
-package com.example.alien.cloudtasker;
+package com.example.alien.cloudtasker.ui.taskList;
 
 import android.content.Context;
 import android.content.Intent;
@@ -6,10 +6,8 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.example.alien.cloudtasker.di.taskService.DatabaseModule;
-import com.example.alien.cloudtasker.di.taskService.NetworkModule;
-import com.example.alien.cloudtasker.di.taskService.TaskServiceModule;
-import com.example.alien.cloudtasker.di.usersViewModel.UserViewModelModule;
+import com.example.alien.cloudtasker.R;
+import com.example.alien.cloudtasker.di.taskList.TaskListModule;
 import com.example.alien.cloudtasker.ui.auth.AuthActivity;
 import com.example.alien.cloudtasker.ui.common.SingleFragmentActivity;
 import com.firebase.ui.auth.AuthUI;
@@ -21,7 +19,10 @@ import androidx.fragment.app.Fragment;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
-public class SecondActivity extends SingleFragmentActivity {
+public class TaskListActivity extends SingleFragmentActivity {
+
+    private static final String SCOPE_NAME = "TaskList";
+    private static final String PARENT_SCOPE_NAME_KEY = "TaskListActivity.ParenScopeName";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -31,34 +32,21 @@ public class SecondActivity extends SingleFragmentActivity {
         if (user == null) {
             AuthActivity.start(this);
             finish();
-        } else {
-            Scope scope = Toothpick.openScopes("Application", "TaskService");
-            scope.installModules(new TaskServiceModule(user.getUid()),
-                    new NetworkModule(),
-                    new DatabaseModule());
         }
     }
 
     @Override
     protected Fragment getFragment() {
-        Scope scope = Toothpick.openScopes("TaskService", "SecondActivity");
-        scope.installModules(new UserViewModelModule(this));
-        return TestFragment.newInstance();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        Toothpick.closeScope("SecondActivity");
-    }
-
-    public static void start(Context context) {
-        if (context != null) {
-            Intent intent = new Intent(context, SecondActivity.class);
-            context.startActivity(intent);
+        Intent intent = getIntent();
+        String parentScopeName = intent.getStringExtra(PARENT_SCOPE_NAME_KEY);
+        Scope scope;
+        if (parentScopeName != null && !parentScopeName.isEmpty()) {
+            scope = Toothpick.openScopes(parentScopeName, SCOPE_NAME);
         } else {
-            throw new IllegalArgumentException("Context can't be null");
+            scope = Toothpick.openScope(SCOPE_NAME);
         }
+        scope.installModules(new TaskListModule(this, SCOPE_NAME));
+        return scope.getInstance(TaskListFragment.class);
     }
 
     @Override
@@ -86,5 +74,23 @@ public class SecondActivity extends SingleFragmentActivity {
                     AuthActivity.start(context);
                     finish();
                 });
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        Toothpick.closeScope(SCOPE_NAME);
+    }
+
+    public static void start(Context context, String parentScopeName) {
+        if (context != null) {
+            Intent intent = new Intent(context, TaskListActivity.class);
+            if (parentScopeName != null && !parentScopeName.isEmpty()) {
+                intent.putExtra(PARENT_SCOPE_NAME_KEY, parentScopeName);
+            }
+            context.startActivity(intent);
+        } else {
+            throw new IllegalArgumentException("Context can't be null");
+        }
     }
 }

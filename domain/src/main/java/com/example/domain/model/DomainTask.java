@@ -78,6 +78,21 @@ public class DomainTask {
         this.executorName = executorName;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DomainTask) {
+            DomainTask task = (DomainTask) o;
+            return taskId != null && taskId.equals(task.getTaskId())
+                    && authorId != null && authorId.equals(task.authorId)
+                    && executorId != null && executorId.equals(task.executorId)
+                    && authorName != null && authorName.equals(task.authorName)
+                    && executorName != null && executorName.equals(task.executorName)
+                    && title != null && title.equals(task.title)
+                    && text != null && text.equals(task.text);
+        }
+        return false;
+    }
+
     public enum Type {
         ADDED,
         MODIFIED,

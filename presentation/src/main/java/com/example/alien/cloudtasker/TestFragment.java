@@ -24,11 +24,7 @@ import toothpick.Scope;
 import toothpick.Toothpick;
 
 public class TestFragment extends Fragment {
-    private static final String USER_COLLECTION_NAME = "users";
-    private static final String TASK_COLLECTION_NAME = "tasks";
-    private FirebaseFirestore mDatabase;
     private FirebaseUser mUser;
-    private ListenerRegistration mRegistration;
 
     @Inject
     IUsersViewModel mUsersViewModel;
@@ -48,9 +44,7 @@ public class TestFragment extends Fragment {
         View view = inflater.inflate(R.layout.fr_test, container, false);
         mUser = FirebaseAuth.getInstance().getCurrentUser();
         if (mUser != null) {
-            //initFirestore();
-            //initListener();
-            Scope scope = Toothpick.openScopes("SecondActivity");
+            Scope scope = Toothpick.openScope("SecondActivity");
             Toothpick.inject(this, scope);
             mUsersViewModel.updateUser(new DomainUser(mUser.getUid(), mUser.getDisplayName(), null));
             mUsersViewModel.getUsers();
@@ -58,31 +52,4 @@ public class TestFragment extends Fragment {
         return view;
     }
 
-    private void initFirestore() {
-
-        mDatabase = FirebaseFirestore.getInstance();
-        FirebaseFirestoreSettings settings = new FirebaseFirestoreSettings.Builder()
-                .setTimestampsInSnapshotsEnabled(true)
-                .build();
-        mDatabase.setFirestoreSettings(settings);
-    }
-
-    private void initListener() {
-        mRegistration = mDatabase.collection(TASK_COLLECTION_NAME)
-                .whereEqualTo("authorUserId", mUser.getUid())
-                //.orderBy("time", Query.Direction.ASCENDING)
-                .addSnapshotListener(this::snapshotListener);
-
-    }
-
-    private void snapshotListener(QuerySnapshot queryDocumentSnapshots, FirebaseFirestoreException e) {
-        if (e != null) {
-            return;
-        }
-        if (queryDocumentSnapshots != null && !queryDocumentSnapshots.getMetadata().hasPendingWrites())
-            if (!queryDocumentSnapshots.isEmpty()) {
-                for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
-                }
-            }
-    }
 }

@@ -10,13 +10,14 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".AuthActivity" android:launchMode="singleInstance">
+        <activity android:name=".ui.auth.AuthActivity" android:launchMode="singleInstance">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity android:name=".SecondActivity" android:launchMode="singleInstance"/>
+        <activity android:name=".ui.taskList.TaskListActivity" android:launchMode="singleInstance"/>
     </application>
 
 </manifest>

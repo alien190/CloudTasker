@@ -1,7 +1,9 @@
-package com.example.alien.cloudtasker;
+package com.example.alien.cloudtasker.ui.common;
 
 
 import android.os.Bundle;
+
+import com.example.alien.cloudtasker.R;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
