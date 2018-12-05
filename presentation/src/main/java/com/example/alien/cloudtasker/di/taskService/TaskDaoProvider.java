@@ -5,6 +5,7 @@ import android.content.Context;
 import com.example.data.database.ITaskDao;
 import com.example.data.database.TaskDatabase;
 
+import javax.inject.Inject;
 import javax.inject.Provider;
 
 import androidx.room.Room;
@@ -12,6 +13,7 @@ import androidx.room.Room;
 public class TaskDaoProvider implements Provider<ITaskDao> {
     private Context mContext;
 
+    @Inject
     public TaskDaoProvider(Context context) {
         mContext = context;
     }

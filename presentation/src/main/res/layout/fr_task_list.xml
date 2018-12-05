@@ -8,6 +8,10 @@
         <variable
             name="scopeName"
             type="String" />
+
+        <variable
+            name="vm"
+            type="com.example.alien.cloudtasker.ui.taskList.ITaskListViewModel"/>
     </data>
 
     <FrameLayout
@@ -15,12 +19,12 @@
         android:layout_height="match_parent"
         tools:context=".ui.taskList.TaskListFragment">
 
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recycler"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            bind:scopeName="@{scopeName}" />
+            bind:scopeName="@{scopeName}"
+            bind:taskList="@{vm.taskList}"/>
 
     </FrameLayout>
 </layout>

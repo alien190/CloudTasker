@@ -6,11 +6,25 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
-        <item name="android:colorBackground">@color/colorPrimary</item>
+        <item name="android:colorBackground">@color/colorWhite</item>
     </style>
 
     <style name="AppTheme.Auth">
         <item name="android:colorBackground">@color/colorPrimary</item>
+    </style>
+
+    <style name="TaskCaption">
+        <item name="android:textColor">@color/colorPrimaryDark</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:textAlignment">center</item>
+        <item name="android:maxLines">1</item>
+        <item name="android:ellipsize">end</item>
+    </style>
+
+    <style name="TaskText">
+        <item name="android:maxLines">2</item>
+        <item name="android:ellipsize">end</item>
+        <item name="android:textColor">@color/colorBlack</item>
     </style>
 
 </resources>

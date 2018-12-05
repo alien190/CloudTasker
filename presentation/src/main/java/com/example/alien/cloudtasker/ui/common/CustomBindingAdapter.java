@@ -1,6 +1,10 @@
 package com.example.alien.cloudtasker.ui.common;
 
+import com.example.alien.cloudtasker.ui.taskList.ITaskListViewModel;
 import com.example.alien.cloudtasker.ui.taskList.TaskListAdapter;
+import com.example.domain.model.DomainTask;
+
+import java.util.List;
 
 import androidx.databinding.BindingAdapter;
 import androidx.recyclerview.widget.RecyclerView;
@@ -9,7 +13,7 @@ import toothpick.Toothpick;
 
 public class CustomBindingAdapter {
     @BindingAdapter("bind:scopeName")
-    public static void setRecyclerViewTaskListSource(RecyclerView recyclerView, String scopeName) {
+    public static void setRecyclerViewTaskListScope(RecyclerView recyclerView, String scopeName) {
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         if (adapter == null) {
             Scope scope = Toothpick.openScope(scopeName);
@@ -28,5 +32,12 @@ public class CustomBindingAdapter {
         recyclerView.setAdapter(taskListAdapter);
     }
 
+    @BindingAdapter("bind:taskList")
+    public static void setRecyclerViewTaskListSource(RecyclerView recyclerView, List<DomainTask> domainTasks) {
+        RecyclerView.Adapter adapter = recyclerView.getAdapter();
+        if (adapter instanceof TaskListAdapter) {
+            ((TaskListAdapter) adapter).submitList(domainTasks);
+        }
+    }
 
 }

@@ -79,7 +79,7 @@ public class TaskListActivity extends SingleFragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Toothpick.closeScope(SCOPE_NAME);
+       // Toothpick.closeScope(SCOPE_NAME);
     }
 
     public static void start(Context context, String parentScopeName) {
