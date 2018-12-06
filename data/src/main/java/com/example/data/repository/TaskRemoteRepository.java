@@ -24,6 +24,7 @@ import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import timber.log.Timber;
 
 import static android.content.Context.ACTIVITY_SERVICE;
@@ -115,7 +116,7 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     private List<DomainTask> mapTask(QuerySnapshot queryDocumentSnapshots) {
         List<DomainTask> tasks = new ArrayList<>();
-        if (queryDocumentSnapshots != null && !queryDocumentSnapshots.getMetadata().hasPendingWrites())
+        if (queryDocumentSnapshots != null) //&& !queryDocumentSnapshots.getMetadata().hasPendingWrites()
             if (!queryDocumentSnapshots.isEmpty()) {
                 for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
                     DomainTask task = FireBaseToDomainConverter.convertTask(documentChange);
@@ -136,6 +137,11 @@ public class TaskRemoteRepository implements ITaskRepository {
         } else {
             return Completable.error(new IllegalArgumentException("task can't be null"));
         }
+    }
+
+    @Override
+    public Single<DomainTask> getTaskById(String taskId) {
+        return Single.error(getError());
     }
 
     private Throwable getError() {

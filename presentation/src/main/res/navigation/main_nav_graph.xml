@@ -19,7 +19,7 @@
         android:label="fr_task_detail"
         tools:layout="@layout/fr_task_detail" >
         <argument
-            android:name="userId"
+            android:name="taskId"
             app:argType="string" />
     </fragment>
 </navigation>

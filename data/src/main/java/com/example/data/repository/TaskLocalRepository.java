@@ -11,6 +11,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -112,6 +113,14 @@ public class TaskLocalRepository implements ITaskRepository {
         return mTaskDao.getTasksWithUsersLive(mUserId)
                 .map(DatabaseToDomainConverter::convertTasksWithUsers)
                 .subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Single<DomainTask> getTaskById(String taskId) {
+        return mTaskDao.getTaskWithUsersById(taskId)
+                .map(DatabaseToDomainConverter::convertTaskWithUsers)
+                .subscribeOn(Schedulers.io());
+
     }
 
     private Throwable getError() {

@@ -10,6 +10,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
@@ -62,11 +63,16 @@ public class TaskServiceImpl implements ITaskService {
 
     @Override
     public Flowable<List<DomainUser>> getUserList() {
-        return mLocalRepository.getUserList();
+        return mLocalRepository.getUserList().subscribeOn(Schedulers.io());
     }
 
     @Override
     public Flowable<List<DomainTask>> getTaskList() {
-        return mLocalRepository.getTaskList();
+        return mLocalRepository.getTaskList().subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Single<DomainTask> getTaskById(String taskId) {
+        return mLocalRepository.getTaskById(taskId).subscribeOn(Schedulers.io());
     }
 }

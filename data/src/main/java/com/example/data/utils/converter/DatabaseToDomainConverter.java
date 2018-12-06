@@ -88,7 +88,7 @@ public final class DatabaseToDomainConverter {
         }
     }
 
-    private static DomainTask convertTaskWithUsers(DatabaseTaskWithUsers databaseTask) {
+    public static DomainTask convertTaskWithUsers(DatabaseTaskWithUsers databaseTask) {
         DomainTask domainTask = convertTask(databaseTask);
         domainTask.setAuthorName(databaseTask.getAuthorName());
         domainTask.setExecutorName(databaseTask.getExecutorName());

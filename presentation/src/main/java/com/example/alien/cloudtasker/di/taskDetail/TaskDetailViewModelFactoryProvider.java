@@ -12,7 +12,7 @@ class TaskDetailViewModelFactoryProvider implements Provider<TaskDetailViewModel
     private String mUserId;
 
     @Inject
-    public TaskDetailViewModelFactoryProvider(ITaskService taskService, @Named(ITaskDetailViewModel.USER_ID) String userId) {
+    public TaskDetailViewModelFactoryProvider(ITaskService taskService, @Named(ITaskDetailViewModel.TASK_ID) String userId) {
         mTaskService = taskService;
         mUserId = userId;
     }

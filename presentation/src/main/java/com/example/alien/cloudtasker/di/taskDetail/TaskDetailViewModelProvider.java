@@ -15,7 +15,8 @@ class TaskDetailViewModelProvider implements Provider<ITaskDetailViewModel> {
     private TaskDetailViewModelFactory mFactory;
 
     @Inject
-    public TaskDetailViewModelProvider(FragmentActivity activity, TaskDetailViewModelFactory factory) {
+    public TaskDetailViewModelProvider(FragmentActivity activity,
+                                       TaskDetailViewModelFactory factory) {
         mActivity = activity;
         mFactory = factory;
     }

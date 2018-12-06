@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
+import io.reactivex.Single;
 
 public interface ITaskService {
 
@@ -17,5 +18,7 @@ public interface ITaskService {
     Flowable<List<DomainTask>> getTaskList();
 
     Completable updateTask(DomainTask task);
+
+    Single<DomainTask> getTaskById(String taskId);
 
 }
