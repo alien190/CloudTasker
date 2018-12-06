@@ -5,8 +5,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.example.alien.cloudtasker.R;
 import com.example.alien.cloudtasker.databinding.TaskListBinding;
+import com.example.alien.cloudtasker.di.taskDetail.TaskDetailModule;
+import com.example.alien.cloudtasker.ui.common.IChangeFragment;
 import com.example.alien.cloudtasker.ui.taskDetail.TaskDetailFragment;
 
 import javax.inject.Inject;
@@ -14,7 +15,7 @@ import javax.inject.Inject;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
+import timber.log.Timber;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
@@ -23,6 +24,7 @@ public class TaskListFragment extends Fragment {
 
     @Inject
     ITaskListViewModel mViewModel;
+    private String mScopeName;
 
     public static TaskListFragment newInstance(String scopeName) {
 
@@ -38,11 +40,11 @@ public class TaskListFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         Bundle args = getArguments();
         if (args != null) {
-            String scopeName = args.getString(SCOPE_NAME_KEY);
-            if (scopeName != null && !scopeName.isEmpty()) {
+            mScopeName = args.getString(SCOPE_NAME_KEY);
+            if (mScopeName != null && !mScopeName.isEmpty()) {
                 TaskListBinding taskListBinding = TaskListBinding.inflate(inflater);
-                taskListBinding.setScopeName(scopeName);
-                Scope scope = Toothpick.openScope(scopeName);
+                taskListBinding.setScopeName(mScopeName);
+                Scope scope = Toothpick.openScope(mScopeName);
                 Toothpick.inject(this, scope);
                 mViewModel.getTaskDetailId().observe(this, this::showTaskDetail);
                 taskListBinding.setVm(mViewModel);
@@ -53,16 +55,23 @@ public class TaskListFragment extends Fragment {
         throw new IllegalArgumentException("scopeName can't be null or empty");
     }
 
+
     private void showTaskDetail(String taskId) {
         if (taskId != null) {
-            FragmentManager fragmentManager = getFragmentManager();
-            if (fragmentManager != null) {
-                fragmentManager.beginTransaction()
-                        .replace(R.id.fragmentContainer, TaskDetailFragment.newInstance())
-                        .addToBackStack(TaskDetailFragment.class.getSimpleName())
-                        .commit();
-            }
+            TaskDetailFragment.start(mScopeName, taskId);
             mViewModel.getTaskDetailId().setValue(null);
+        }
+    }
+
+    public static void start(String parentScopeName, String taskId) {
+        try {
+            Scope scope = Toothpick.openScopes(parentScopeName, SCOPE_NAME);
+            scope.installModules(new TaskDetailModule(taskId));
+            IChangeFragment changeFragment = scope.getInstance(IChangeFragment.class);
+            Fragment fragment = scope.getInstance(TaskDetailFragment.class);
+            changeFragment.changeFragment(fragment);
+        } catch (Throwable throwable) {
+            Timber.d(throwable);
         }
     }
 }

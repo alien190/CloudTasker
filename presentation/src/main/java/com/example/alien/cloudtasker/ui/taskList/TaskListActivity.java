@@ -33,10 +33,6 @@ public class TaskListActivity extends SingleFragmentActivity {
             AuthActivity.start(this);
             finish();
         }
-    }
-
-    @Override
-    protected Fragment getFragment() {
         Intent intent = getIntent();
         String parentScopeName = intent.getStringExtra(PARENT_SCOPE_NAME_KEY);
         Scope scope;
@@ -46,6 +42,12 @@ public class TaskListActivity extends SingleFragmentActivity {
             scope = Toothpick.openScope(SCOPE_NAME);
         }
         scope.installModules(new TaskListModule(this, SCOPE_NAME));
+
+    }
+
+    @Override
+    protected Fragment getFragment() {
+
         return scope.getInstance(TaskListFragment.class);
     }
 
@@ -79,7 +81,7 @@ public class TaskListActivity extends SingleFragmentActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-       // Toothpick.closeScope(SCOPE_NAME);
+        Toothpick.closeScope(SCOPE_NAME);
     }
 
     public static void start(Context context, String parentScopeName) {

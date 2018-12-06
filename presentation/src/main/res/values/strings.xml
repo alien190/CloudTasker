@@ -2,7 +2,10 @@
     <string name="app_name">CloudTasker</string>
     <string name="auth_error">Ошибка аутентификации</string>
     <string name="logout">Выйти из аккаунта</string>
-    <string name="title">Заголовок</string>
-    <string name="text">Текст задачи</string>
-    <string name="author">Автор</string>
+    <string name="task_title">Название</string>
+    <string name="task_text">Описание</string>
+    <string name="task_author">Инициатор</string>
+    <string name="task_executor">Исполнитель</string>
+    <string name="task_state">Состояние</string>
+    <string name="task_complete">Выполнено</string>
 </resources>
