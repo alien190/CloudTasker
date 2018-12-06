@@ -16,15 +16,12 @@ import com.example.alien.cloudtasker.R;
 import com.example.alien.cloudtasker.di.taskService.DatabaseModule;
 import com.example.alien.cloudtasker.di.taskService.NetworkModule;
 import com.example.alien.cloudtasker.di.taskService.TaskServiceModule;
-import com.example.alien.cloudtasker.ui.taskList.TaskListActivity;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
-
-import javax.inject.Named;
 
 public class AuthActivity extends AppCompatActivity {
 
@@ -52,7 +49,7 @@ public class AuthActivity extends AppCompatActivity {
                     .setLogo(R.drawable.hello)
                     .build(), RC_SIGN_IN);
         } else {
-            startTaskListActivity(user.getUid());
+            startNavigationHostActivity(user.getUid());
         }
     }
 
@@ -61,7 +58,7 @@ public class AuthActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                startTaskListActivity(user.getUid());
+                startNavigationHostActivity(user.getUid());
             } else {
                 Toast.makeText(this, R.string.auth_error, Toast.LENGTH_SHORT).show();
                 finish();
@@ -69,13 +66,12 @@ public class AuthActivity extends AppCompatActivity {
         }
     }
 
-    private void startTaskListActivity(String userId) {
+    private void startNavigationHostActivity(String userId) {
         String scopeName = "TaskService";
         Scope scope = Toothpick.openScopes("Application", scopeName);
         scope.installModules(new TaskServiceModule(userId),
                 new NetworkModule(),
                 new DatabaseModule());
-        TaskListActivity.start(this, scopeName);
         NavigationHostActivity.start(this);
         finish();
     }
