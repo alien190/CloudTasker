@@ -1,7 +1,11 @@
 package com.example.alien.cloudtasker.ui.common;
 
 import com.example.alien.cloudtasker.ui.taskList.TaskListAdapter;
+import com.example.alien.cloudtasker.ui.userDialog.IUserDialogCallback;
 import com.example.domain.model.DomainTask;
+import com.example.domain.model.DomainUser;
+import com.google.android.material.chip.Chip;
+import com.google.android.material.chip.ChipGroup;
 
 import java.util.List;
 
@@ -33,12 +37,32 @@ public class CustomBindingAdapter {
 
     @BindingAdapter({"bind:taskList", "bind:itemClickListener"})
     public static void setRecyclerViewTaskListSourceAndListener(RecyclerView recyclerView,
-                                                     List<DomainTask> domainTasks,
-                                                     TaskListAdapter.IOnItemClickListener clickListener) {
+                                                                List<DomainTask> domainTasks,
+                                                                TaskListAdapter.IOnItemClickListener clickListener) {
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         if (adapter instanceof TaskListAdapter) {
             ((TaskListAdapter) adapter).setClickListener(clickListener);
             ((TaskListAdapter) adapter).submitList(domainTasks);
         }
     }
+
+    @BindingAdapter({"bind:userList", "bind:onUserClick"})
+    public static void setChipGroupScopeName(ChipGroup chipGroup, List<DomainUser> users, IUserDialogCallback callback) {
+        if (users != null) {
+            chipGroup.removeAllViews();
+            for (DomainUser user : users) {
+                Chip chip = new Chip(chipGroup.getContext());
+                chip.setText(user.getDisplayName());
+                chip.setTag(user.getUserId());
+                chip.setOnClickListener(v -> {
+                    if (callback != null) {
+                        callback.onUserClick((String) chip.getTag(), (String) chip.getText());
+                    }
+                });
+                chipGroup.addView(chip);
+            }
+        }
+    }
+
+
 }

@@ -1,28 +1,36 @@
-package com.example.alien.cloudtasker;
+package com.example.alien.cloudtasker.ui.userDialog;
 
 import com.example.domain.model.DomainUser;
 import com.example.domain.service.ITaskService;
 
+import java.util.List;
+
+import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
-public class UsersViewModel extends ViewModel implements IUsersViewModel {
+public class UserViewModel extends ViewModel implements IUserViewModel {
     private ITaskService mTaskService;
     private CompositeDisposable mDisposable;
+    private MutableLiveData<List<DomainUser>> mUsers = new MutableLiveData<>();
 
-    public UsersViewModel(ITaskService taskService) {
+    public UserViewModel(ITaskService taskService) {
         if (taskService != null) {
             mTaskService = taskService;
             mDisposable = new CompositeDisposable();
+            mDisposable.add(mTaskService.getUserList()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe(mUsers::postValue, Timber::d));
         } else {
             throw new IllegalArgumentException("taskService can't be null");
         }
     }
 
     @Override
-    public void getUsers() {
-
+    public MutableLiveData<List<DomainUser>> getUsers() {
+        return mUsers;
     }
 
     @Override

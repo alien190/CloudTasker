@@ -91,7 +91,8 @@
                         <com.google.android.material.chip.Chip
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{vm.authorName}" />
+                            android:text="@{vm.authorName}"
+                            android:onClick="@{() -> vm.onAuthorClick()}"/>
                     </LinearLayout>
 
                     <TextView
@@ -125,7 +126,8 @@
                         <com.google.android.material.chip.Chip
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@{vm.executorName}" />
+                            android:text="@{vm.executorName}"
+                            android:onClick="@{() -> vm.onExecutorClick()}"/>
                     </LinearLayout>
 
                     <TextView

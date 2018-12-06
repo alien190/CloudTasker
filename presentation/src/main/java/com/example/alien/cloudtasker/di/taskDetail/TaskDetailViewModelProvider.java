@@ -1,7 +1,6 @@
 package com.example.alien.cloudtasker.di.taskDetail;
 
 
-import com.example.alien.cloudtasker.ui.taskDetail.ITaskDetailViewModel;
 import com.example.alien.cloudtasker.ui.taskDetail.TaskDetailViewModel;
 
 import javax.inject.Inject;
@@ -10,7 +9,7 @@ import javax.inject.Provider;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProviders;
 
-class TaskDetailViewModelProvider implements Provider<ITaskDetailViewModel> {
+class TaskDetailViewModelProvider implements Provider<TaskDetailViewModel> {
     private FragmentActivity mActivity;
     private TaskDetailViewModelFactory mFactory;
 
@@ -22,7 +21,7 @@ class TaskDetailViewModelProvider implements Provider<ITaskDetailViewModel> {
     }
 
     @Override
-    public ITaskDetailViewModel get() {
+    public TaskDetailViewModel get() {
         return ViewModelProviders.of(mActivity, mFactory).get(TaskDetailViewModel.class);
     }
 }

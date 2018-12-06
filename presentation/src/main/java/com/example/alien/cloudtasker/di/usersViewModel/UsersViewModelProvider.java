@@ -3,14 +3,14 @@ package com.example.alien.cloudtasker.di.usersViewModel;
 
 import androidx.lifecycle.ViewModelProviders;
 
-import com.example.alien.cloudtasker.UsersViewModel;
+import com.example.alien.cloudtasker.ui.userDialog.UserViewModel;
 
 import javax.inject.Inject;
 import javax.inject.Provider;
 
 import androidx.fragment.app.FragmentActivity;
 
-class UsersViewModelProvider implements Provider<UsersViewModel> {
+class UsersViewModelProvider implements Provider<UserViewModel> {
     private FragmentActivity mActivity;
     private UsersViewModelFactory mFactory;
 
@@ -21,7 +21,7 @@ class UsersViewModelProvider implements Provider<UsersViewModel> {
     }
 
     @Override
-    public UsersViewModel get() {
-        return ViewModelProviders.of(mActivity, mFactory).get(UsersViewModel.class);
+    public UserViewModel get() {
+        return ViewModelProviders.of(mActivity, mFactory).get(UserViewModel.class);
     }
 }

@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:bind="http://schemas.android.com/apk/res-auto">
+
+    <data class="UserDialogBinding">
+
+        <variable
+            name="vm"
+            type="com.example.alien.cloudtasker.ui.userDialog.IUserViewModel" />
+
+        <variable
+            name="clickCallback"
+            type="com.example.alien.cloudtasker.ui.userDialog.IUserDialogCallback" />
+    </data>
+
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <com.google.android.material.chip.ChipGroup
+            android:id="@+id/container"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_margin="@dimen/margin"
+            bind:onUserClick="@{clickCallback}"
+            bind:userList="@{vm.getUsers}">
+
+        </com.google.android.material.chip.ChipGroup>
+    </FrameLayout>
+</layout>

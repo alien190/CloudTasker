@@ -1,6 +1,6 @@
 package com.example.alien.cloudtasker.di.usersViewModel;
 
-import com.example.alien.cloudtasker.UsersViewModel;
+import com.example.alien.cloudtasker.ui.userDialog.UserViewModel;
 import com.example.domain.service.ITaskService;
 
 import androidx.annotation.NonNull;
@@ -17,6 +17,6 @@ class UsersViewModelFactory implements ViewModelProvider.Factory {
     @NonNull
     @Override
     public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        return (T) new UsersViewModel(mTrackService);
+        return (T) new UserViewModel(mTrackService);
     }
 }

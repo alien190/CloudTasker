@@ -7,12 +7,16 @@ import android.view.ViewGroup;
 
 import com.example.alien.cloudtasker.databinding.TaskDetailBinding;
 import com.example.alien.cloudtasker.di.taskDetail.TaskDetailModule;
+import com.example.alien.cloudtasker.ui.taskList.TaskListFragmentDirections;
+import com.example.alien.cloudtasker.ui.userDialog.UserDialogFragment;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.Navigation;
 import timber.log.Timber;
 import toothpick.Scope;
 import toothpick.Toothpick;
@@ -22,6 +26,7 @@ public class TaskDetailFragment extends Fragment {
     @Inject
     ITaskDetailViewModel mViewModel;
     private String mTaskId;
+    private View mView;
 
 
     public static TaskDetailFragment newInstance() {
@@ -40,13 +45,26 @@ public class TaskDetailFragment extends Fragment {
         TaskDetailBinding taskDetailBinding = TaskDetailBinding.inflate(inflater);
         taskDetailBinding.setVm(mViewModel);
         taskDetailBinding.setLifecycleOwner(this);
-        mViewModel.getFinish().observe(this, this::onFinish);
-        return taskDetailBinding.getRoot();
+        mViewModel.getOnFinish().observe(this, this::onFinish);
+        mViewModel.getOnShowAuthorDialogFragment().observe(this, this::onShowAuthorDialogFragment);
+        mView = taskDetailBinding.getRoot();
+        return mView;
     }
 
     private void onFinish(Boolean isFinish) {
-        if(isFinish!=null && isFinish) {
-            mViewModel.getFinish().setValue(null);
+        if (isFinish != null && isFinish) {
+            mViewModel.getOnFinish().setValue(null);
+            FragmentManager fragmentManager = getFragmentManager();
+            if (fragmentManager != null) {
+                fragmentManager.popBackStack();
+            }
+        }
+    }
+
+    private void onShowAuthorDialogFragment(String authorId) {
+        if (authorId != null) {
+            mViewModel.getOnShowAuthorDialogFragment().setValue(null);
+            UserDialogFragment.showDialogFragment(this, SCOPE_NAME);
         }
     }
 

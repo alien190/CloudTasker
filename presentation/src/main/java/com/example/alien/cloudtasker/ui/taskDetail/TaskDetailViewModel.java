@@ -1,10 +1,9 @@
 package com.example.alien.cloudtasker.ui.taskDetail;
 
+import com.example.alien.cloudtasker.ui.userDialog.IUserDialogCallback;
 import com.example.domain.model.DomainTask;
 import com.example.domain.service.ITaskService;
 
-import androidx.databinding.Bindable;
-import androidx.lifecycle.MediatorLiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import io.reactivex.Single;
@@ -12,7 +11,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import timber.log.Timber;
 
-public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewModel {
+public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewModel, IUserDialogCallback {
     private String mTaskId;
     private ITaskService mTaskService;
     private MutableLiveData<String> mTaskTitle = new MutableLiveData<>();
@@ -21,8 +20,10 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
     private MutableLiveData<String> mExecutorName = new MutableLiveData<>();
     private MutableLiveData<Boolean> mIsComplete = new MutableLiveData<>();
     private CompositeDisposable mDisposable = new CompositeDisposable();
-    private MutableLiveData<Boolean> mFinish = new MutableLiveData<>();
+    private MutableLiveData<Boolean> mOnFinish = new MutableLiveData<>();
+    private MutableLiveData<String> mOnShowUserDialogFragment = new MutableLiveData<>();
     private DomainTask mTask;
+    private boolean isAuthorEditing;
 
     public TaskDetailViewModel(ITaskService TaskService, String userId) {
         mTaskService = TaskService;
@@ -68,7 +69,7 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
         mTask.setComplete(mIsComplete.getValue());
         mDisposable.add(mTaskService.updateTask(mTask)
                 .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> mFinish.setValue(true), Timber::d));
+                .subscribe(() -> mOnFinish.setValue(true), Timber::d));
     }
 
     @Override
@@ -78,6 +79,29 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
             mDisposable.dispose();
             mDisposable.clear();
             mDisposable = null;
+        }
+    }
+
+    @Override
+    public void onAuthorClick() {
+        isAuthorEditing = true;
+        mOnShowUserDialogFragment.setValue(mTask.getAuthorId());
+    }
+
+    @Override
+    public void onExecutorClick() {
+        isAuthorEditing = false;
+        mOnShowUserDialogFragment.setValue(mTask.getAuthorId());
+    }
+
+    @Override
+    public void onUserClick(String userId, String userName) {
+        if (isAuthorEditing) {
+            mAuthorName.setValue(userName);
+            mTask.setAuthorId(userId);
+        } else {
+            mExecutorName.setValue(userId);
+            mTask.setExecutorId(userId);
         }
     }
 
@@ -116,7 +140,12 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
         return mIsComplete;
     }
 
-    public MutableLiveData<Boolean> getFinish() {
-        return mFinish;
+    public MutableLiveData<Boolean> getOnFinish() {
+        return mOnFinish;
     }
+
+    public MutableLiveData<String> getOnShowAuthorDialogFragment() {
+        return mOnShowUserDialogFragment;
+    }
+
 }
