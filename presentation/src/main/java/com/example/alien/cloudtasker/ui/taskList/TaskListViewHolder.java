@@ -14,6 +14,8 @@ public class TaskListViewHolder extends RecyclerView.ViewHolder {
     private TextView mTitleTextView;
     private TextView mTextTextView;
     private ImageView mCompleteImageView;
+    private TaskListAdapter.IOnItemClickListener mClickListener;
+    private String mTaskId;
 
 
     public TaskListViewHolder(@NonNull View itemView) {
@@ -21,9 +23,11 @@ public class TaskListViewHolder extends RecyclerView.ViewHolder {
         mTitleTextView = itemView.findViewById(R.id.tv_title);
         mTextTextView = itemView.findViewById(R.id.tv_text);
         mCompleteImageView = itemView.findViewById(R.id.iv_complete);
+        itemView.setOnClickListener(this::onClick);
     }
 
-    public void bind(DomainTask task) {
+    public void bind(DomainTask task, TaskListAdapter.IOnItemClickListener clickListener) {
+        mClickListener = clickListener;
         if (task != null) {
             if (task.getTitle() != null) {
                 mTitleTextView.setText(task.getTitle());
@@ -31,7 +35,14 @@ public class TaskListViewHolder extends RecyclerView.ViewHolder {
             if (task.getText() != null) {
                 mTextTextView.setText(task.getText());
             }
+            mTaskId = task.getTaskId();
             mCompleteImageView.setVisibility(task.isComplete() ? View.VISIBLE : View.INVISIBLE);
+        }
+    }
+
+    private void onClick(View view) {
+        if (mClickListener != null) {
+            mClickListener.inItemClick(mTaskId);
         }
     }
 }

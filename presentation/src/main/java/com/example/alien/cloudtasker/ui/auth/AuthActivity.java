@@ -11,6 +11,7 @@ import toothpick.Toothpick;
 import android.os.Bundle;
 import android.widget.Toast;
 
+import com.example.alien.cloudtasker.NavigationHostActivity;
 import com.example.alien.cloudtasker.R;
 import com.example.alien.cloudtasker.di.taskService.DatabaseModule;
 import com.example.alien.cloudtasker.di.taskService.NetworkModule;
@@ -22,6 +23,8 @@ import com.google.firebase.auth.FirebaseUser;
 
 import java.util.Arrays;
 import java.util.List;
+
+import javax.inject.Named;
 
 public class AuthActivity extends AppCompatActivity {
 
@@ -73,6 +76,7 @@ public class AuthActivity extends AppCompatActivity {
                 new NetworkModule(),
                 new DatabaseModule());
         TaskListActivity.start(this, scopeName);
+        NavigationHostActivity.start(this);
         finish();
     }
 

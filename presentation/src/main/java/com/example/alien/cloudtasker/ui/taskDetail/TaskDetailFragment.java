@@ -7,11 +7,9 @@ import android.view.ViewGroup;
 
 import com.example.alien.cloudtasker.R;
 import com.example.alien.cloudtasker.di.taskDetail.TaskDetailModule;
-import com.example.alien.cloudtasker.ui.common.IChangeFragment;
 
 import javax.inject.Inject;
 
-import androidx.annotation.IdRes;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -23,6 +21,7 @@ public class TaskDetailFragment extends Fragment {
     private static final String SCOPE_NAME = "TaskDetail";
     @Inject
     ITaskDetailViewModel mViewModel;
+
 
 
     public static TaskDetailFragment newInstance() {
@@ -42,8 +41,10 @@ public class TaskDetailFragment extends Fragment {
     }
 
     private void injectToothpick() {
-        Scope scope = Toothpick.openScope(SCOPE_NAME);
         try {
+            Scope scope = Toothpick.openScopes("TaskList", SCOPE_NAME);
+            String userId = TaskDetailFragmentArgs.fromBundle(getArguments()).getUserId();
+            scope.installModules(new TaskDetailModule(userId));
             Toothpick.inject(this, scope);
         } catch (Throwable throwable) {
             Timber.d(throwable);
@@ -51,19 +52,13 @@ public class TaskDetailFragment extends Fragment {
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
+    public void onDestroy() {
+        super.onDestroy();
+        Toothpick.closeScope(SCOPE_NAME);
     }
 
-    public static void start(String parentScopeName, String taskId) {
-        try {
-            Scope scope = Toothpick.openScopes(parentScopeName, SCOPE_NAME);
-            scope.installModules(new TaskDetailModule(taskId));
-            IChangeFragment changeFragment = scope.getInstance(IChangeFragment.class);
-            Fragment fragment = scope.getInstance(TaskDetailFragment.class);
-            changeFragment.changeFragment(fragment);
-        } catch (Throwable throwable) {
-            Timber.d(throwable);
-        }
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 }

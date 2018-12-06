@@ -24,7 +24,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             bind:scopeName="@{scopeName}"
-            bind:taskList="@{vm.taskList}" />
+            bind:taskList="@{vm.taskList}"
+            bind:itemClickListener = "@{(v) -> vm.showTaskDetail(v)}"/>
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
             android:layout_width="wrap_content"

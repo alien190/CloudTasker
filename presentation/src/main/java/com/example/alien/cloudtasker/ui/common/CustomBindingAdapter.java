@@ -1,6 +1,5 @@
 package com.example.alien.cloudtasker.ui.common;
 
-import com.example.alien.cloudtasker.ui.taskList.ITaskListViewModel;
 import com.example.alien.cloudtasker.ui.taskList.TaskListAdapter;
 import com.example.domain.model.DomainTask;
 
@@ -32,12 +31,14 @@ public class CustomBindingAdapter {
         recyclerView.setAdapter(taskListAdapter);
     }
 
-    @BindingAdapter("bind:taskList")
-    public static void setRecyclerViewTaskListSource(RecyclerView recyclerView, List<DomainTask> domainTasks) {
+    @BindingAdapter({"bind:taskList", "bind:itemClickListener"})
+    public static void setRecyclerViewTaskListSourceAndListener(RecyclerView recyclerView,
+                                                     List<DomainTask> domainTasks,
+                                                     TaskListAdapter.IOnItemClickListener clickListener) {
         RecyclerView.Adapter adapter = recyclerView.getAdapter();
         if (adapter instanceof TaskListAdapter) {
+            ((TaskListAdapter) adapter).setClickListener(clickListener);
             ((TaskListAdapter) adapter).submitList(domainTasks);
         }
     }
-
 }

@@ -17,6 +17,7 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.taskList.TaskListActivity" android:launchMode="singleInstance"/>
+        <activity android:name=".NavigationHostActivity" android:launchMode="singleInstance"/>
     </application>
 
 </manifest>

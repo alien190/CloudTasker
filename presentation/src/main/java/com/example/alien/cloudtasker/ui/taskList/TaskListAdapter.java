@@ -12,11 +12,13 @@ import androidx.recyclerview.widget.DiffUtil;
 import androidx.recyclerview.widget.ListAdapter;
 
 public class TaskListAdapter extends ListAdapter<DomainTask, TaskListViewHolder> {
+    private IOnItemClickListener mClickListener;
+
     private static final DiffUtil.ItemCallback<DomainTask> DIFF_CALLBACK =
             new DiffUtil.ItemCallback<DomainTask>() {
                 @Override
                 public boolean areItemsTheSame(@NonNull DomainTask oldItem, @NonNull DomainTask newItem) {
-                    return oldItem.getTaskId()!=null && oldItem.getTaskId().equals(newItem.getTaskId());
+                    return oldItem.getTaskId() != null && oldItem.getTaskId().equals(newItem.getTaskId());
                 }
 
                 @Override
@@ -43,7 +45,14 @@ public class TaskListAdapter extends ListAdapter<DomainTask, TaskListViewHolder>
 
     @Override
     public void onBindViewHolder(@NonNull TaskListViewHolder holder, int position) {
-        holder.bind(getItem(position));
+        holder.bind(getItem(position), mClickListener);
     }
 
+    public void setClickListener(IOnItemClickListener clickListener) {
+        mClickListener = clickListener;
+    }
+
+    public interface IOnItemClickListener {
+        void inItemClick(String userId);
+    }
 }

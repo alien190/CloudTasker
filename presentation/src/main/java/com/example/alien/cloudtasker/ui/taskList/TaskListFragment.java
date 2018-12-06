@@ -6,16 +6,13 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.alien.cloudtasker.databinding.TaskListBinding;
-import com.example.alien.cloudtasker.di.taskDetail.TaskDetailModule;
-import com.example.alien.cloudtasker.ui.common.IChangeFragment;
-import com.example.alien.cloudtasker.ui.taskDetail.TaskDetailFragment;
 
 import javax.inject.Inject;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import timber.log.Timber;
+import androidx.navigation.Navigation;
 import toothpick.Scope;
 import toothpick.Toothpick;
 
@@ -24,7 +21,8 @@ public class TaskListFragment extends Fragment {
 
     @Inject
     ITaskListViewModel mViewModel;
-    private String mScopeName;
+
+    private View mView;
 
     public static TaskListFragment newInstance(String scopeName) {
 
@@ -38,40 +36,26 @@ public class TaskListFragment extends Fragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        Bundle args = getArguments();
-        if (args != null) {
-            mScopeName = args.getString(SCOPE_NAME_KEY);
-            if (mScopeName != null && !mScopeName.isEmpty()) {
-                TaskListBinding taskListBinding = TaskListBinding.inflate(inflater);
-                taskListBinding.setScopeName(mScopeName);
-                Scope scope = Toothpick.openScope(mScopeName);
-                Toothpick.inject(this, scope);
-                mViewModel.getTaskDetailId().observe(this, this::showTaskDetail);
-                taskListBinding.setVm(mViewModel);
-                taskListBinding.setLifecycleOwner(this);
-                return taskListBinding.getRoot();
-            }
-        }
-        throw new IllegalArgumentException("scopeName can't be null or empty");
+        Scope scope = Toothpick.openScope("TaskList");
+        Toothpick.inject(this, scope);
+
+        TaskListBinding taskListBinding = TaskListBinding.inflate(inflater);
+        taskListBinding.setScopeName("TaskList");
+
+        mViewModel.getTaskDetailId().observe(this, this::showTaskDetail);
+        taskListBinding.setVm(mViewModel);
+        taskListBinding.setLifecycleOwner(this);
+        mView = taskListBinding.getRoot();
+        return mView;
     }
 
 
     private void showTaskDetail(String taskId) {
         if (taskId != null) {
-            TaskDetailFragment.start(mScopeName, taskId);
+            TaskListFragmentDirections.ActionTaskListFragmentToTaskDetailFragment action =
+                    TaskListFragmentDirections.actionTaskListFragmentToTaskDetailFragment(taskId);
+            Navigation.findNavController(mView).navigate(action);
             mViewModel.getTaskDetailId().setValue(null);
-        }
-    }
-
-    public static void start(String parentScopeName, String taskId) {
-        try {
-            Scope scope = Toothpick.openScopes(parentScopeName, SCOPE_NAME);
-            scope.installModules(new TaskDetailModule(taskId));
-            IChangeFragment changeFragment = scope.getInstance(IChangeFragment.class);
-            Fragment fragment = scope.getInstance(TaskDetailFragment.class);
-            changeFragment.changeFragment(fragment);
-        } catch (Throwable throwable) {
-            Timber.d(throwable);
         }
     }
 }
