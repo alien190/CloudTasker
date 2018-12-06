@@ -1,5 +1,11 @@
 package com.example.domain.model;
 
+import java.beans.BeanInfo;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.util.HashMap;
+import java.util.Map;
+
 public class DomainTask {
     private String taskId;
     private String authorId;
@@ -14,6 +20,57 @@ public class DomainTask {
     public DomainTask() {
     }
 
+    public DomainTask(DomainTask task) {
+        taskId = task.taskId;
+        authorId = task.authorId;
+        executorId = task.executorId;
+        title = task.title;
+        text = task.title;
+        type = task.type;
+        authorName = task.authorName;
+        executorName = task.executorName;
+        isComplete = task.isComplete;
+    }
+
+    public Map<String, Object> diff(DomainTask updatedTask) {
+        Map<String, Object> retMap = new HashMap<>();
+        try {
+            BeanInfo beanInfo;
+            beanInfo = Introspector.getBeanInfo(DomainTask.class);
+            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
+                if (descriptor.getReadMethod() != null) {
+                    Object oldValue = descriptor.getReadMethod().invoke(this);
+                    Object newValue = descriptor.getReadMethod().invoke(updatedTask);
+                    if (!oldValue.equals(newValue)) {
+                        retMap.put(descriptor.getName(), newValue);
+                    }
+                }
+            }
+        } catch (
+                Throwable throwable)
+
+        {
+            throwable.printStackTrace();
+        }
+
+        return retMap;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof DomainTask) {
+            DomainTask task = (DomainTask) o;
+            return taskId != null && taskId.equals(task.getTaskId())
+                    && authorId != null && authorId.equals(task.authorId)
+                    && executorId != null && executorId.equals(task.executorId)
+                    && authorName != null && authorName.equals(task.authorName)
+                    && executorName != null && executorName.equals(task.executorName)
+                    && title != null && title.equals(task.title)
+                    && text != null && text.equals(task.text)
+                    && isComplete == task.isComplete;
+        }
+        return false;
+    }
 
     public String getTaskId() {
         return taskId;
@@ -87,25 +144,12 @@ public class DomainTask {
         isComplete = complete;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (o instanceof DomainTask) {
-            DomainTask task = (DomainTask) o;
-            return taskId != null && taskId.equals(task.getTaskId())
-                    && authorId != null && authorId.equals(task.authorId)
-                    && executorId != null && executorId.equals(task.executorId)
-                    && authorName != null && authorName.equals(task.authorName)
-                    && executorName != null && executorName.equals(task.executorName)
-                    && title != null && title.equals(task.title)
-                    && text != null && text.equals(task.text)
-                    && isComplete == task.isComplete;
-        }
-        return false;
-    }
 
     public enum Type {
         ADDED,
         MODIFIED,
         REMOVED
     }
+
+
 }

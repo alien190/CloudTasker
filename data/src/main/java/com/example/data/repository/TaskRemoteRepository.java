@@ -19,6 +19,7 @@ import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
@@ -129,14 +130,18 @@ public class TaskRemoteRepository implements ITaskRepository {
     }
 
     @Override
-    public Completable updateTask(DomainTask task) {
-        if (task != null) {
-            DocumentReference reference = mDatabase.collection(TASK_COLLECTION_NAME).document(task.getTaskId());
-            FirebaseTask firebaseTask = DomainToFirebaseConverter.convertTask(task);
-            return RxFirestore.setDocument(reference, firebaseTask);
+    public Completable updateTask(String taskId, Map<String, Object> updateFieldsMap) {
+        if (updateFieldsMap != null && taskId != null && !taskId.isEmpty()) {
+            DocumentReference reference = mDatabase.collection(TASK_COLLECTION_NAME).document(taskId);
+            return RxFirestore.updateDocument(reference, updateFieldsMap);
         } else {
-            return Completable.error(new IllegalArgumentException("task can't be null"));
+            return Completable.error(new IllegalArgumentException("updateFieldsMap && taskId can't be null"));
         }
+    }
+
+    @Override
+    public Completable updateTask(DomainTask task) {
+        return Completable.error(getError());
     }
 
     @Override

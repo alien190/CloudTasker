@@ -4,6 +4,7 @@ import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -27,6 +28,8 @@ public interface ITaskRepository {
     Flowable<List<DomainTask>> getTaskList();
 
     Completable updateTask(DomainTask task);
+
+    Completable updateTask(String taskId, Map<String,Object> updateFieldsMap);
 
     Single<DomainTask> getTaskById(String taskId);
 }

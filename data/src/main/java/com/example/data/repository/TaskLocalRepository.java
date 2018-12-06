@@ -8,6 +8,7 @@ import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -121,6 +122,11 @@ public class TaskLocalRepository implements ITaskRepository {
                 .map(DatabaseToDomainConverter::convertTaskWithUsers)
                 .subscribeOn(Schedulers.io());
 
+    }
+
+    @Override
+    public Completable updateTask(String taskId, Map<String, Object> updateFieldsMap) {
+        return Completable.error(getError());
     }
 
     private Throwable getError() {

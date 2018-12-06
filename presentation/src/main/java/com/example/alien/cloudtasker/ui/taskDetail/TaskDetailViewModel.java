@@ -4,6 +4,9 @@ import com.example.alien.cloudtasker.ui.userDialog.IUserDialogCallback;
 import com.example.domain.model.DomainTask;
 import com.example.domain.service.ITaskService;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 import io.reactivex.Single;
@@ -23,6 +26,7 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
     private MutableLiveData<Boolean> mOnFinish = new MutableLiveData<>();
     private MutableLiveData<String> mOnShowUserDialogFragment = new MutableLiveData<>();
     private DomainTask mTask;
+    private DomainTask mTaskOriginal;
     private boolean isAuthorEditing;
 
     public TaskDetailViewModel(ITaskService TaskService, String userId) {
@@ -54,6 +58,7 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
     private void setTask(DomainTask task) {
         if (task != null) {
             mTask = task;
+            mTaskOriginal = new DomainTask(task);
             mTaskTitle.setValue(task.getTitle());
             mTaskText.setValue(task.getText());
             mIsComplete.setValue(task.isComplete());
@@ -67,6 +72,7 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
         mTask.setTitle(mTaskTitle.getValue());
         mTask.setText(mTaskText.getValue());
         mTask.setComplete(mIsComplete.getValue());
+        Map<String, Object> diff = mTaskOriginal.diff(mTask);
         mDisposable.add(mTaskService.updateTask(mTask)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> mOnFinish.setValue(true), Timber::d));
@@ -100,7 +106,7 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
             mAuthorName.setValue(userName);
             mTask.setAuthorId(userId);
         } else {
-            mExecutorName.setValue(userId);
+            mExecutorName.setValue(userName);
             mTask.setExecutorId(userId);
         }
     }
