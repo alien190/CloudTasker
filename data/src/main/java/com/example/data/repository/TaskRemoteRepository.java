@@ -3,8 +3,6 @@ package com.example.data.repository;
 import android.app.ActivityManager;
 import android.content.Context;
 
-import com.example.data.model.FirebaseTask;
-import com.example.data.model.FirebaseUser;
 import com.example.data.utils.converter.DomainToFirebaseConverter;
 import com.example.data.utils.converter.FireBaseToDomainConverter;
 import com.example.domain.model.DomainTask;
@@ -12,7 +10,6 @@ import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -26,12 +23,8 @@ import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
-import io.reactivex.Maybe;
-import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -43,13 +36,14 @@ public class TaskRemoteRepository implements ITaskRepository {
     private FirebaseFirestore mDatabase;
     private Context mContext;
     private DomainUser mUser;
+    private Disposable mUserUpdateDisposable;
 
     public TaskRemoteRepository(FirebaseFirestore database, Context context, DomainUser user) {
         if (database != null && context != null && user != null && user.getUserId() != null && !user.getUserId().isEmpty()) {
             mDatabase = database;
             mContext = context;
             mUser = user;
-            // actualizeUser();
+            actualizeUser();
         } else {
             throw new IllegalArgumentException("database && context && userId can't be null or empty");
         }
@@ -57,11 +51,12 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     private void actualizeUser() {
         DocumentReference reference = mDatabase.collection(USER_COLLECTION_NAME).document(mUser.getUserId());
-        Disposable disposable = RxFirestore.getDocument(reference).map(FireBaseToDomainConverter::convertUser)
+        mUserUpdateDisposable = RxFirestore.getDocument(reference).map(FireBaseToDomainConverter::convertUser)
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
                 .flatMap(user -> updateUser(mUser.getUserId(), user.diff(mUser)).toMaybe())
                 .subscribe((v) -> {
+                    int i=1; i++;
                 }, Timber::d);
     }
 

@@ -35,7 +35,7 @@ public class DomainUser {
     public Map<String, Object> diff(DomainUser updatedUser) {
         Map<String, Object> retMap = new HashMap<>();
         if ((mDisplayName == null && updatedUser.mDisplayName != null) || (mDisplayName != null && !mDisplayName.equals(updatedUser.mDisplayName))) {
-            retMap.put("displayName", updatedUser.mDisplayName);
+            retMap.put("userName", updatedUser.mDisplayName);
         }
 
         if ((mPhotoUrl == null && updatedUser.mPhotoUrl != null) || (mPhotoUrl != null && !mPhotoUrl.equals(updatedUser.mPhotoUrl))) {
