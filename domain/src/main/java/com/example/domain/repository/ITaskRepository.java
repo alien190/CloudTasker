@@ -13,13 +13,15 @@ import io.reactivex.Single;
 public interface ITaskRepository {
     String REMOTE = "REMOTE";
     String LOCAL = "LOCAL";
-    String USER_ID = "USER_ID";
+    String LOGGED_USER = "LoggedUser";
 
     Flowable<List<DomainUser>> getUserList();
 
     void cleanCacheIfNeed(Throwable throwable);
 
     Completable updateUser(DomainUser user);
+
+    Completable updateUser(String userId, Map<String, Object> updateFieldsMap);
 
     Completable insertUsers(List<DomainUser> users);
 

@@ -17,6 +17,7 @@ public final class DomainToDatabaseConverter {
             databaseUser.setLastLoginTime(domainUser.getLastLoginTime().getTime());
             databaseUser.setUserId(domainUser.getUserId());
             databaseUser.setUserName(domainUser.getDisplayName());
+            databaseUser.setPhotoUrl(domainUser.getPhotoUrl());
             return databaseUser;
         } else {
             throw new IllegalArgumentException("domainUser can't be null");

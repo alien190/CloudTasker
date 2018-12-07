@@ -7,6 +7,7 @@ import com.example.domain.repository.ITaskRepository;
 import org.reactivestreams.Publisher;
 
 import java.util.List;
+import java.util.Map;
 
 import io.reactivex.Completable;
 import io.reactivex.Flowable;
@@ -48,16 +49,17 @@ public class TaskServiceImpl implements ITaskService {
                 }, Throwable::printStackTrace));
     }
 
+
     @Override
-    public Completable updateUser(DomainUser user) {
-        return mRemoteRepository.updateUser(user)
+    public Completable updateUser(String userId, Map<String, Object> updateFieldsMap) {
+        return mRemoteRepository.updateUser(userId, updateFieldsMap)
                 //.doOnError(mRemoteRepository::cleanCacheIfNeed)
                 .subscribeOn(Schedulers.io());
     }
 
     @Override
-    public Completable updateTask(DomainTask task) {
-        return mRemoteRepository.updateTask(task)
+    public Completable updateTask(String taskId, Map<String, Object> updateFieldsMap) {
+        return mRemoteRepository.updateTask(taskId, updateFieldsMap)
                 .subscribeOn(Schedulers.io());
     }
 

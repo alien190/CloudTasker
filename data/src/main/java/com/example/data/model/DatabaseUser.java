@@ -12,6 +12,7 @@ public class DatabaseUser {
     private String userId;
     private String userName;
     private long lastLoginTime;
+    private String photoUrl;
 
     public DatabaseUser() {
     }
@@ -38,5 +39,13 @@ public class DatabaseUser {
 
     public void setLastLoginTime(long lastLoginTime) {
         this.lastLoginTime = lastLoginTime;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

@@ -18,14 +18,14 @@ import timber.log.Timber;
 
 public class TaskLocalRepository implements ITaskRepository {
     private ITaskDao mTaskDao;
-    private String mUserId;
+    private DomainUser mUser;
 
-    public TaskLocalRepository(ITaskDao taskDao, String userId) {
-        if (taskDao != null && userId != null && !userId.isEmpty()) {
+    public TaskLocalRepository(ITaskDao taskDao, DomainUser user) {
+        if (taskDao != null && user != null && user.getUserId() != null && !user.getUserId().isEmpty()) {
             mTaskDao = taskDao;
-            mUserId = userId;
+            mUser = user;
         } else {
-            throw new IllegalArgumentException("taskDao && userId can't be null or empty");
+            throw new IllegalArgumentException("taskDao && user can't be null or empty");
         }
     }
 
@@ -56,6 +56,8 @@ public class TaskLocalRepository implements ITaskRepository {
         return Completable.fromRunnable(() -> {
             for (DomainUser user : users) {
                 try {
+                    Timber.d("insertUsers userId:%s, userName:%s, type:%s",
+                            user.getUserId(), user.getDisplayName(), user.getType().toString());
                     switch (user.getType()) {
                         case ADDED: {
                             mTaskDao.insertUser(DomainToDatabaseConverter.convertUser(user));
@@ -85,6 +87,8 @@ public class TaskLocalRepository implements ITaskRepository {
         return Completable.fromRunnable(() -> {
             for (DomainTask task : domainTasks) {
                 try {
+                    Timber.d("insertTasks taskId:%s, taskTitle:%s, type:%s",
+                            task.getTaskId(), task.getTitle(), task.getType().toString());
                     switch (task.getType()) {
                         case ADDED: {
                             mTaskDao.insertTask(DomainToDatabaseConverter.convertTask(task));
@@ -111,7 +115,7 @@ public class TaskLocalRepository implements ITaskRepository {
 
     @Override
     public Flowable<List<DomainTask>> getTaskList() {
-        return mTaskDao.getTasksWithUsersLive(mUserId)
+        return mTaskDao.getTasksWithUsersLive(mUser.getUserId())
                 .map(DatabaseToDomainConverter::convertTasksWithUsers)
                 .subscribeOn(Schedulers.io());
     }
@@ -126,6 +130,11 @@ public class TaskLocalRepository implements ITaskRepository {
 
     @Override
     public Completable updateTask(String taskId, Map<String, Object> updateFieldsMap) {
+        return Completable.error(getError());
+    }
+
+    @Override
+    public Completable updateUser(String userId, Map<String, Object> updateFieldsMap) {
         return Completable.error(getError());
     }
 

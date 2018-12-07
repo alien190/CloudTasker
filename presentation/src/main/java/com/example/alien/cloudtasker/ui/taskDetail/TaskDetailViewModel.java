@@ -73,7 +73,7 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
         mTask.setText(mTaskText.getValue());
         mTask.setComplete(mIsComplete.getValue());
         Map<String, Object> diff = mTaskOriginal.diff(mTask);
-        mDisposable.add(mTaskService.updateTask(mTask)
+        mDisposable.add(mTaskService.updateTask(mTaskId, diff)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(() -> mOnFinish.setValue(true), Timber::d));
     }

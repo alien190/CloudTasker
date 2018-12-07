@@ -5,6 +5,7 @@ import com.example.data.model.FirebaseUser;
 import com.example.domain.model.DomainTask;
 import com.example.domain.model.DomainUser;
 import com.google.firebase.firestore.DocumentChange;
+import com.google.firebase.firestore.DocumentSnapshot;
 
 import timber.log.Timber;
 
@@ -17,12 +18,25 @@ public final class FireBaseToDomainConverter {
             domainUser.setLastLoginTime(firebaseUser.getLastLoginTime());
             domainUser.setUserId(documentChange.getDocument().getId());
             domainUser.setType(DomainUser.Type.valueOf(documentChange.getType().name()));
+            domainUser.setPhotoUrl(firebaseUser.getPhotoUrl());
         } catch (Throwable throwable) {
             Timber.d(throwable);
         }
         return domainUser;
     }
 
+    public static DomainUser convertUser(DocumentSnapshot documentSnapshot) {
+        if (documentSnapshot != null) {
+            FirebaseUser firebaseUser = documentSnapshot.toObject(FirebaseUser.class);
+            DomainUser domainUser = new DomainUser();
+            domainUser.setUserId(documentSnapshot.getId());
+            domainUser.setDisplayName(firebaseUser.getUserName());
+            domainUser.setPhotoUrl(firebaseUser.getPhotoUrl());
+            return domainUser;
+        } else {
+            throw new IllegalArgumentException("documentSnapshot can't be null");
+        }
+    }
 
     public static DomainTask convertTask(DocumentChange documentChange) {
         DomainTask domainTask = new DomainTask();

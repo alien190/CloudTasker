@@ -12,6 +12,7 @@ import com.example.domain.model.DomainUser;
 import com.example.domain.repository.ITaskRepository;
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Query;
@@ -25,7 +26,13 @@ import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
+import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
 import static android.content.Context.ACTIVITY_SERVICE;
@@ -35,16 +42,27 @@ public class TaskRemoteRepository implements ITaskRepository {
     private static final String TASK_COLLECTION_NAME = "tasks";
     private FirebaseFirestore mDatabase;
     private Context mContext;
-    private String mUserId;
+    private DomainUser mUser;
 
-    public TaskRemoteRepository(FirebaseFirestore database, Context context, String userId) {
-        if (database != null && context != null && userId != null && !userId.isEmpty()) {
+    public TaskRemoteRepository(FirebaseFirestore database, Context context, DomainUser user) {
+        if (database != null && context != null && user != null && user.getUserId() != null && !user.getUserId().isEmpty()) {
             mDatabase = database;
             mContext = context;
-            mUserId = userId;
+            mUser = user;
+            actualizeUser();
         } else {
             throw new IllegalArgumentException("database && context && userId can't be null or empty");
         }
+    }
+
+    private void actualizeUser() {
+        DocumentReference reference = mDatabase.collection(USER_COLLECTION_NAME).document(mUser.getUserId());
+        Disposable disposable = RxFirestore.getDocument(reference).map(FireBaseToDomainConverter::convertUser)
+                .observeOn(Schedulers.io())
+                .subscribeOn(Schedulers.io())
+                .flatMap(user -> updateUser(mUser.getUserId(), user.diff(mUser)).toMaybe())
+                .subscribe((v) -> {
+                }, Timber::d);
     }
 
     @Override
@@ -61,6 +79,8 @@ public class TaskRemoteRepository implements ITaskRepository {
                     DomainUser user = FireBaseToDomainConverter.convertUser(documentChange);
                     if (user != null && user.getUserId() != null && !user.getUserId().isEmpty()) {
                         users.add(user);
+                        Timber.d("mapUser userId:%s, userName:%s, type:%s",
+                                user.getUserId(), user.getDisplayName(), user.getType().toString());
                     }
                 }
             }
@@ -80,12 +100,16 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     @Override
     public Completable updateUser(DomainUser user) {
-        if (user != null) {
-            DocumentReference reference = mDatabase.collection(USER_COLLECTION_NAME).document(user.getUserId());
-            FirebaseUser firebaseUser = DomainToFirebaseConverter.convertUser(user);
-            return RxFirestore.setDocument(reference, firebaseUser);
+        return Completable.error(getError());
+    }
+
+    @Override
+    public Completable updateUser(String userId, Map<String, Object> updateFieldsMap) {
+        if (updateFieldsMap != null && !updateFieldsMap.isEmpty() && userId != null && !userId.isEmpty()) {
+            DocumentReference reference = mDatabase.collection(USER_COLLECTION_NAME).document(userId);
+            return RxFirestore.updateDocument(reference, updateFieldsMap);
         } else {
-            return Completable.error(new IllegalArgumentException("user can't be null"));
+            return Completable.error(new IllegalArgumentException("updateFieldsMap && userId can't be null or empty"));
         }
     }
 
@@ -109,8 +133,8 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     @Override
     public Flowable<List<DomainTask>> getTaskList() {
-        Query queryAuthor = mDatabase.collection(TASK_COLLECTION_NAME).whereEqualTo("authorId", mUserId);
-        Query queryExecutor = mDatabase.collection(TASK_COLLECTION_NAME).whereEqualTo("executorId", mUserId);
+        Query queryAuthor = mDatabase.collection(TASK_COLLECTION_NAME).whereEqualTo("authorId", mUser.getUserId());
+        Query queryExecutor = mDatabase.collection(TASK_COLLECTION_NAME).whereEqualTo("executorId", mUser.getUserId());
         return RxFirestore.observeQueryRef(queryAuthor).map(this::mapTask)
                 .mergeWith(RxFirestore.observeQueryRef(queryExecutor).map(this::mapTask));
     }
@@ -123,6 +147,8 @@ public class TaskRemoteRepository implements ITaskRepository {
                     DomainTask task = FireBaseToDomainConverter.convertTask(documentChange);
                     if (task != null && task.getTaskId() != null && !task.getTaskId().isEmpty()) {
                         tasks.add(task);
+                        Timber.d("mapTask taskId:%s, taskTitle:%s, type:%s",
+                                task.getTaskId(), task.getTitle(), task.getType().toString());
                     }
                 }
             }
@@ -131,11 +157,11 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     @Override
     public Completable updateTask(String taskId, Map<String, Object> updateFieldsMap) {
-        if (updateFieldsMap != null && taskId != null && !taskId.isEmpty()) {
+        if (updateFieldsMap != null && !updateFieldsMap.isEmpty() && taskId != null && !taskId.isEmpty()) {
             DocumentReference reference = mDatabase.collection(TASK_COLLECTION_NAME).document(taskId);
             return RxFirestore.updateDocument(reference, updateFieldsMap);
         } else {
-            return Completable.error(new IllegalArgumentException("updateFieldsMap && taskId can't be null"));
+            return Completable.error(new IllegalArgumentException("updateFieldsMap && taskId can't be null or empty"));
         }
     }
 

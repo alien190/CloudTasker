@@ -8,6 +8,7 @@ public class FirebaseUser {
     @ServerTimestamp
     Date lastLoginTime;
     private String userName;
+    private String photoUrl;
 
     public FirebaseUser() {
     }
@@ -26,5 +27,13 @@ public class FirebaseUser {
 
     public void setUserName(String userName) {
         this.userName = userName;
+    }
+
+    public String getPhotoUrl() {
+        return photoUrl;
+    }
+
+    public void setPhotoUrl(String photoUrl) {
+        this.photoUrl = photoUrl;
     }
 }

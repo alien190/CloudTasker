@@ -10,6 +10,8 @@ import androidx.room.Dao;
 import androidx.room.Insert;
 import androidx.room.OnConflictStrategy;
 import androidx.room.Query;
+import androidx.room.Transaction;
+import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.Single;
 
@@ -19,10 +21,10 @@ public interface ITaskDao {
     //void insertUsers(List<DatabaseUser> users);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertUser(DatabaseUser user);
+    Completable insertUser(DatabaseUser user);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertTask(DatabaseTask task);
+    Completable insertTask(DatabaseTask task);
 
     @Query("SELECT * FROM databaseuser")
     Single<List<DatabaseUser>> getUsers();

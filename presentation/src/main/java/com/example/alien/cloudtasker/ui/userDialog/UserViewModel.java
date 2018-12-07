@@ -33,11 +33,6 @@ public class UserViewModel extends ViewModel implements IUserViewModel {
         return mUsers;
     }
 
-    @Override
-    public void updateUser(DomainUser user) {
-        mDisposable.add(mTaskService.updateUser(user).subscribe(() -> {
-        }, Timber::d));
-    }
 
     @Override
     protected void onCleared() {

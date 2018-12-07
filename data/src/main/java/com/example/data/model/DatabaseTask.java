@@ -6,6 +6,7 @@ import androidx.room.ForeignKey;
 import androidx.room.PrimaryKey;
 
 import static androidx.room.ForeignKey.CASCADE;
+import static androidx.room.ForeignKey.NO_ACTION;
 
 @Entity(foreignKeys = {
         @ForeignKey(
@@ -18,6 +19,7 @@ import static androidx.room.ForeignKey.CASCADE;
                 parentColumns = "userId",
                 childColumns = "executorId",
                 onDelete = CASCADE)})
+//@Entity
 public class DatabaseTask {
     @PrimaryKey
     @NonNull

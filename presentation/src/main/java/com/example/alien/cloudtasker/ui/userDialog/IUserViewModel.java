@@ -8,5 +8,4 @@ import androidx.lifecycle.MutableLiveData;
 
 public interface IUserViewModel {
     MutableLiveData<List<DomainUser>> getUsers();
-    void updateUser(DomainUser user);
 }

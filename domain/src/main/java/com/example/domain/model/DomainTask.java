@@ -1,8 +1,5 @@
 package com.example.domain.model;
 
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,23 +31,20 @@ public class DomainTask {
 
     public Map<String, Object> diff(DomainTask updatedTask) {
         Map<String, Object> retMap = new HashMap<>();
-        try {
-            BeanInfo beanInfo;
-            beanInfo = Introspector.getBeanInfo(DomainTask.class);
-            for (PropertyDescriptor descriptor : beanInfo.getPropertyDescriptors()) {
-                if (descriptor.getReadMethod() != null) {
-                    Object oldValue = descriptor.getReadMethod().invoke(this);
-                    Object newValue = descriptor.getReadMethod().invoke(updatedTask);
-                    if (!oldValue.equals(newValue)) {
-                        retMap.put(descriptor.getName(), newValue);
-                    }
-                }
-            }
-        } catch (
-                Throwable throwable)
-
-        {
-            throwable.printStackTrace();
+        if (!authorId.equals(updatedTask.authorId)) {
+            retMap.put("authorId", updatedTask.authorId);
+        }
+        if (!executorId.equals(updatedTask.executorId)) {
+            retMap.put("executorId", updatedTask.executorId);
+        }
+        if (!title.equals(updatedTask.title)) {
+            retMap.put("title", updatedTask.title);
+        }
+        if (!text.equals(updatedTask.text)) {
+            retMap.put("text", updatedTask.text);
+        }
+        if (!isComplete== updatedTask.isComplete) {
+            retMap.put("isComplete", updatedTask.isComplete);
         }
 
         return retMap;

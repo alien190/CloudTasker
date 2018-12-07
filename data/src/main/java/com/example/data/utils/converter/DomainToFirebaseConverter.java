@@ -10,6 +10,7 @@ public final class DomainToFirebaseConverter {
         if (domainUser != null) {
             FirebaseUser firebaseUser = new FirebaseUser();
             firebaseUser.setUserName(domainUser.getDisplayName());
+            firebaseUser.setPhotoUrl(domainUser.getPhotoUrl());
             return firebaseUser;
         } else {
             throw new IllegalArgumentException("domainUser can't be null");

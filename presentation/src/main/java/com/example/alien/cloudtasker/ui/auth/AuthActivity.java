@@ -16,6 +16,7 @@ import com.example.alien.cloudtasker.R;
 import com.example.alien.cloudtasker.di.taskService.DatabaseModule;
 import com.example.alien.cloudtasker.di.taskService.NetworkModule;
 import com.example.alien.cloudtasker.di.taskService.TaskServiceModule;
+import com.example.domain.model.DomainUser;
 import com.firebase.ui.auth.AuthUI;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -49,7 +50,7 @@ public class AuthActivity extends AppCompatActivity {
                     .setLogo(R.drawable.hello)
                     .build(), RC_SIGN_IN);
         } else {
-            startNavigationHostActivity(user.getUid());
+            startNavigationHostActivity(user);
         }
     }
 
@@ -58,7 +59,7 @@ public class AuthActivity extends AppCompatActivity {
         if (requestCode == RC_SIGN_IN) {
             if (resultCode == RESULT_OK) {
                 FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-                startNavigationHostActivity(user.getUid());
+                startNavigationHostActivity(user);
             } else {
                 Toast.makeText(this, R.string.auth_error, Toast.LENGTH_SHORT).show();
                 finish();
@@ -66,10 +67,15 @@ public class AuthActivity extends AppCompatActivity {
         }
     }
 
-    private void startNavigationHostActivity(String userId) {
+    private void startNavigationHostActivity(FirebaseUser user) {
         String scopeName = "TaskService";
+        DomainUser domainUser = new DomainUser();
+        domainUser.setUserId(user.getUid());
+        domainUser.setDisplayName(user.getDisplayName());
+        domainUser.setPhotoUrl(user.getPhotoUrl() != null ? user.getPhotoUrl().toString() : "");
+
         Scope scope = Toothpick.openScopes("Application", scopeName);
-        scope.installModules(new TaskServiceModule(userId),
+        scope.installModules(new TaskServiceModule(domainUser),
                 new NetworkModule(),
                 new DatabaseModule());
         NavigationHostActivity.start(this);

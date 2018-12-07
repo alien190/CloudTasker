@@ -7,7 +7,7 @@ import com.example.data.model.DatabaseUser;
 import androidx.room.Database;
 import androidx.room.RoomDatabase;
 
-@Database(entities = {DatabaseUser.class, DatabaseTask.class}, version = 4)
+@Database(entities = {DatabaseUser.class, DatabaseTask.class}, version = 9)
 public abstract class TaskDatabase extends RoomDatabase {
     public abstract ITaskDao getTaskDao();
 }
