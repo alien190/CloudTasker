@@ -49,7 +49,7 @@ public class TaskRemoteRepository implements ITaskRepository {
             mDatabase = database;
             mContext = context;
             mUser = user;
-            actualizeUser();
+           // actualizeUser();
         } else {
             throw new IllegalArgumentException("database && context && userId can't be null or empty");
         }

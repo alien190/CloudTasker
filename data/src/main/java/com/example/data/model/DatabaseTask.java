@@ -8,18 +8,18 @@ import androidx.room.PrimaryKey;
 import static androidx.room.ForeignKey.CASCADE;
 import static androidx.room.ForeignKey.NO_ACTION;
 
-@Entity(foreignKeys = {
-        @ForeignKey(
-                entity = DatabaseUser.class,
-                parentColumns = "userId",
-                childColumns = "authorId",
-                onDelete = CASCADE),
-        @ForeignKey(
-                entity = DatabaseUser.class,
-                parentColumns = "userId",
-                childColumns = "executorId",
-                onDelete = CASCADE)})
-//@Entity
+//@Entity(foreignKeys = {
+//        @ForeignKey(
+//                entity = DatabaseUser.class,
+//                parentColumns = "userId",
+//                childColumns = "authorId",
+//                onDelete = CASCADE),
+//        @ForeignKey(
+//                entity = DatabaseUser.class,
+//                parentColumns = "userId",
+//                childColumns = "executorId",
+//                onDelete = CASCADE)})
+@Entity
 public class DatabaseTask {
     @PrimaryKey
     @NonNull

@@ -21,10 +21,10 @@ public interface ITaskDao {
     //void insertUsers(List<DatabaseUser> users);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertUser(DatabaseUser user);
+    void insertUser(DatabaseUser user);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    Completable insertTask(DatabaseTask task);
+    void insertTask(DatabaseTask task);
 
     @Query("SELECT * FROM databaseuser")
     Single<List<DatabaseUser>> getUsers();

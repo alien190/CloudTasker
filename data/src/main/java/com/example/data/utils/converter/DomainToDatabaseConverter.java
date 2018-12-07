@@ -14,7 +14,7 @@ public final class DomainToDatabaseConverter {
     public static DatabaseUser convertUser(DomainUser domainUser) {
         if (domainUser != null) {
             DatabaseUser databaseUser = new DatabaseUser();
-            databaseUser.setLastLoginTime(domainUser.getLastLoginTime().getTime());
+//            databaseUser.setLastLoginTime(domainUser.getLastLoginTime().getTime());
             databaseUser.setUserId(domainUser.getUserId());
             databaseUser.setUserName(domainUser.getDisplayName());
             databaseUser.setPhotoUrl(domainUser.getPhotoUrl());
