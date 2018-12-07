@@ -21,15 +21,15 @@ public class DomainTask {
     }
 
     public DomainTask(DomainTask task) {
-        taskId = task.taskId;
-        authorId = task.authorId;
-        executorId = task.executorId;
-        title = task.title;
-        text = task.title;
-        type = task.type;
-        authorName = task.authorName;
-        executorName = task.executorName;
-        isComplete = task.isComplete;
+        taskId = task.getTaskId();
+        authorId = task.getAuthorId();
+        executorId = task.getExecutorId();
+        title = task.getTitle();
+        text = task.getText();
+        type = task.getType();
+        authorName = task.getAuthorName();
+        executorName = task.getExecutorName();
+        isComplete = task.isComplete();
     }
 
     public Map<String, Object> diff(DomainTask updatedTask) {
