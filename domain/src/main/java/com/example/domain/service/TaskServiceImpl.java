@@ -6,6 +6,7 @@ import com.example.domain.repository.ITaskRepository;
 
 import org.reactivestreams.Publisher;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -76,5 +77,17 @@ public class TaskServiceImpl implements ITaskService {
     @Override
     public Single<DomainTask> getTaskById(String taskId) {
         return mLocalRepository.getTaskById(taskId).subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Completable insertTask(DomainTask task) {
+        List<DomainTask> domainTasks = new ArrayList<>();
+        domainTasks.add(task);
+        return mRemoteRepository.insertTasks(domainTasks).subscribeOn(Schedulers.io());
+    }
+
+    @Override
+    public Single<DomainUser> getLoggedUser() {
+        return mLocalRepository.getLoggedUser().subscribeOn(Schedulers.io());
     }
 }

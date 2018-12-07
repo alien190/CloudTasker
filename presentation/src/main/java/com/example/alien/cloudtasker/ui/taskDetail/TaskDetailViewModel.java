@@ -2,6 +2,7 @@ package com.example.alien.cloudtasker.ui.taskDetail;
 
 import com.example.alien.cloudtasker.ui.userDialog.IUserDialogCallback;
 import com.example.domain.model.DomainTask;
+import com.example.domain.model.DomainUser;
 import com.example.domain.service.ITaskService;
 
 import java.util.HashMap;
@@ -9,9 +10,11 @@ import java.util.Map;
 
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
+import io.reactivex.Completable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.functions.Function;
 import timber.log.Timber;
 
 public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewModel, IUserDialogCallback {
@@ -46,7 +49,17 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
                 task.setComplete(false);
                 task.setAuthorName("");
                 task.setExecutorName("");
-                mDisposable.add(Single.just(task).subscribe(this::setTask));
+                mDisposable.add(mTaskService.getLoggedUser().map(new Function<DomainUser, DomainTask>() {
+                    @Override
+                    public DomainTask apply(DomainUser user) throws Exception {
+                        task.setAuthorId(user.getUserId());
+                        task.setAuthorName(user.getDisplayName());
+                        task.setExecutorId(user.getUserId());
+                        task.setExecutorName(user.getDisplayName());
+                        return task;
+                    }
+                }).subscribe(this::setTask));
+                //mDisposable.add(Single.just(task).subscribe(this::setTask));
             } else {
                 mDisposable.add(mTaskService.getTaskById(mTaskId)
                         .observeOn(AndroidSchedulers.mainThread())
@@ -59,23 +72,31 @@ public class TaskDetailViewModel extends ViewModel implements ITaskDetailViewMod
         if (task != null) {
             mTask = task;
             mTaskOriginal = new DomainTask(task);
-            mTaskTitle.setValue(task.getTitle());
-            mTaskText.setValue(task.getText());
-            mIsComplete.setValue(task.isComplete());
-            mAuthorName.setValue(task.getAuthorName());
-            mExecutorName.setValue(task.getExecutorName());
+            mTaskTitle.postValue(task.getTitle());
+            mTaskText.postValue(task.getText());
+            mIsComplete.postValue(task.isComplete());
+            mAuthorName.postValue(task.getAuthorName());
+            mExecutorName.postValue(task.getExecutorName());
         }
     }
 
     @Override
     public void updateTask() {
+        Completable completable;
         mTask.setTitle(mTaskTitle.getValue());
         mTask.setText(mTaskText.getValue());
-        mTask.setComplete(mIsComplete.getValue());
-        Map<String, Object> diff = mTaskOriginal.diff(mTask);
-        mDisposable.add(mTaskService.updateTask(mTaskId, diff)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe(() -> mOnFinish.setValue(true), Timber::d));
+        mTask.setComplete(mIsComplete.getValue() != null ? mIsComplete.getValue() : false);
+        if (!mTask.getTaskId().isEmpty()) {
+            Map<String, Object> diff = mTaskOriginal.diff(mTask);
+            completable = mTaskService.updateTask(mTaskId, diff);
+        } else {
+            completable = mTaskService.insertTask(mTask);
+        }
+        mDisposable.add(completable.observeOn(AndroidSchedulers.mainThread())
+                .subscribe(() -> mOnFinish.setValue(true), throwable -> {
+                    Timber.d(throwable);
+                    mOnFinish.setValue(true);
+                }));
     }
 
     @Override

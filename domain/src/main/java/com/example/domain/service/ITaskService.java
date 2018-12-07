@@ -22,4 +22,8 @@ public interface ITaskService {
 
     Single<DomainTask> getTaskById(String taskId);
 
+    Completable insertTask(DomainTask task);
+
+    Single<DomainUser> getLoggedUser();
+
 }

@@ -34,4 +34,6 @@ public interface ITaskRepository {
     Completable updateTask(String taskId, Map<String,Object> updateFieldsMap);
 
     Single<DomainTask> getTaskById(String taskId);
+
+    Single<DomainUser> getLoggedUser();
 }

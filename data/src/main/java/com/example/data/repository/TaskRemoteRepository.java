@@ -49,7 +49,7 @@ public class TaskRemoteRepository implements ITaskRepository {
             mDatabase = database;
             mContext = context;
             mUser = user;
-           // actualizeUser();
+            // actualizeUser();
         } else {
             throw new IllegalArgumentException("database && context && userId can't be null or empty");
         }
@@ -120,16 +120,26 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     @Override
     public Completable insertTasks(List<DomainTask> domainTasks) {
-        if (domainTasks != null) {
+        if (domainTasks != null && !domainTasks.isEmpty()) {
             CompletableSource[] completableList = new CompletableSource[domainTasks.size()];
-            for (int i = 0; i < domainTasks.size() - 1; i++) {
-                completableList[i] = updateTask(domainTasks.get(i));
+            for (int i = 0; i < domainTasks.size(); i++) {
+                completableList[i] = insertTask(domainTasks.get(i));
             }
             return Completable.concatArray(completableList);
         } else {
-            return Completable.error(new Throwable("domainTasks can't be null"));
+            return Completable.error(new Throwable("domainTasks can't be null or empty"));
         }
     }
+
+    public Completable insertTask(DomainTask task) {
+        if (task != null) {
+            DocumentReference reference = mDatabase.collection(TASK_COLLECTION_NAME).document();
+            return RxFirestore.setDocument(reference, DomainToFirebaseConverter.convertTask(task));
+        } else {
+            return Completable.error(new IllegalArgumentException("task can't be null"));
+        }
+    }
+
 
     @Override
     public Flowable<List<DomainTask>> getTaskList() {
@@ -177,5 +187,10 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     private Throwable getError() {
         return new Throwable("do nothing");
+    }
+
+    @Override
+    public Single<DomainUser> getLoggedUser() {
+        return Single.just(mUser).subscribeOn(Schedulers.io());
     }
 }

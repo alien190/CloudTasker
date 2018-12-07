@@ -47,7 +47,6 @@ public class AuthActivity extends AppCompatActivity {
                     .createSignInIntentBuilder()
                     .setAvailableProviders(providers)
                     .setTheme(R.style.AppTheme_Auth)
-                    .setLogo(R.drawable.hello)
                     .build(), RC_SIGN_IN);
         } else {
             startNavigationHostActivity(user);

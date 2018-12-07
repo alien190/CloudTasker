@@ -141,4 +141,9 @@ public class TaskLocalRepository implements ITaskRepository {
     private Throwable getError() {
         return new Throwable("do nothing");
     }
+
+    @Override
+    public Single<DomainUser> getLoggedUser() {
+        return Single.just(mUser).subscribeOn(Schedulers.io());
+    }
 }
