@@ -56,7 +56,6 @@ public class TaskRemoteRepository implements ITaskRepository {
                 .subscribeOn(Schedulers.io())
                 .flatMap(user -> updateUser(mUser.getUserId(), user.diff(mUser)).toMaybe())
                 .subscribe((v) -> {
-                    int i=1; i++;
                 }, Timber::d);
     }
 
@@ -68,7 +67,7 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     private List<DomainUser> mapUser(QuerySnapshot queryDocumentSnapshots) {
         List<DomainUser> users = new ArrayList<>();
-        if (queryDocumentSnapshots != null && !queryDocumentSnapshots.getMetadata().hasPendingWrites())
+        if (queryDocumentSnapshots != null) //&& !queryDocumentSnapshots.getMetadata().hasPendingWrites())
             if (!queryDocumentSnapshots.isEmpty()) {
                 for (DocumentChange documentChange : queryDocumentSnapshots.getDocumentChanges()) {
                     DomainUser user = FireBaseToDomainConverter.convertUser(documentChange);
