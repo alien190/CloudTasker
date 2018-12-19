@@ -11,7 +11,7 @@ import toothpick.Toothpick;
 import android.os.Bundle;
 import android.widget.Toast;
 
-import com.example.alien.cloudtasker.NavigationHostActivity;
+import com.example.alien.cloudtasker.ui.NavigationHostActivity;
 import com.example.alien.cloudtasker.R;
 import com.example.alien.cloudtasker.di.taskService.DatabaseModule;
 import com.example.alien.cloudtasker.di.taskService.NetworkModule;
@@ -31,7 +31,7 @@ public class AuthActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_auth);
+        setContentView(R.layout.ac_auth);
         auth();
     }
 

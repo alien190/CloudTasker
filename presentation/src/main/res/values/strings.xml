@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">CloudTasker</string>
     <string name="auth_error">Ошибка аутентификации</string>
-    <string name="logout">Выйти из аккаунта</string>
+    <string name="logout">Выйти из аккаунта и очистить кэш</string>
     <string name="task_title">Название</string>
     <string name="task_text">Описание</string>
     <string name="task_author">Инициатор</string>

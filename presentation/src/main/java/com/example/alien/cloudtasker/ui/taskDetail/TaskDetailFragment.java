@@ -1,5 +1,6 @@
 package com.example.alien.cloudtasker.ui.taskDetail;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -71,7 +72,7 @@ public class TaskDetailFragment extends Fragment {
     private void injectToothpick() {
         try {
             mTaskId = TaskDetailFragmentArgs.fromBundle(getArguments()).getTaskId();
-            Scope scope = Toothpick.openScopes("TaskList", SCOPE_NAME);
+            Scope scope = Toothpick.openScopes("TaskService", SCOPE_NAME);
             scope.installModules(new TaskDetailModule(mTaskId));
             Toothpick.inject(this, scope);
         } catch (Throwable throwable) {
@@ -89,4 +90,5 @@ public class TaskDetailFragment extends Fragment {
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
     }
+
 }

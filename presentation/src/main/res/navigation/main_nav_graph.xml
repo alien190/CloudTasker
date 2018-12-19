@@ -12,6 +12,9 @@
         <action
             android:id="@+id/action_taskListFragment_to_taskDetailFragment"
             app:destination="@id/taskDetailFragment" />
+        <action
+            android:id="@+id/action_taskListFragment_to_authFragment"
+            app:destination="@id/authFragment" />
     </fragment>
     <fragment
         android:id="@+id/taskDetailFragment"
@@ -22,4 +25,9 @@
             android:name="taskId"
             app:argType="string" />
     </fragment>
+    <fragment
+        android:id="@+id/authFragment"
+        android:name="com.example.alien.cloudtasker.ui.auth.AuthFragment"
+        android:label="ac_auth"
+        tools:layout="@layout/ac_auth" ></fragment>
 </navigation>
