@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "131770150061",
+    "firebase_url": "https://cloudtaskerdemo.firebaseio.com",
+    "project_id": "cloudtaskerdemo",
+    "storage_bucket": "cloudtaskerdemo.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:131770150061:android:182c6538bad0430b",
+        "android_client_info": {
+          "package_name": "com.example.alien.cloudtasker"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "131770150061-ov8a26uf96uk22nkrsmg4gt5clo9qnr2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAN2ZSaPi72lLIl8M0jRj1j_gJDkRnaDRs"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
