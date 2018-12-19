@@ -23,8 +23,12 @@ import durdinapps.rxfirebase2.RxFirestore;
 import io.reactivex.Completable;
 import io.reactivex.CompletableSource;
 import io.reactivex.Flowable;
+import io.reactivex.Maybe;
+import io.reactivex.MaybeSource;
 import io.reactivex.Single;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.functions.Action;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import timber.log.Timber;
 
@@ -51,12 +55,25 @@ public class TaskRemoteRepository implements ITaskRepository {
 
     private void actualizeUser() {
         DocumentReference reference = mDatabase.collection(USER_COLLECTION_NAME).document(mUser.getUserId());
-        mUserUpdateDisposable = RxFirestore.getDocument(reference).map(FireBaseToDomainConverter::convertUser)
+        mUserUpdateDisposable = RxFirestore.getDocument(reference)
+                .map(FireBaseToDomainConverter::convertUser)
                 .observeOn(Schedulers.io())
                 .subscribeOn(Schedulers.io())
+                .doOnComplete(() -> mUserUpdateDisposable = insertUser(mUser)
+                        .subscribeOn(Schedulers.io())
+                        .observeOn(Schedulers.io())
+                        .subscribe(() -> {
+                        }, Timber::d))
                 .flatMap(user -> updateUser(mUser.getUserId(), user.diff(mUser)).toMaybe())
                 .subscribe((v) -> {
-                }, Timber::d);
+                        }, Timber::d
+                );
+
+//        mUserUpdateDisposable = updateUser(mUser.getUserId(), mUser.diff(new DomainUser()))
+//                .observeOn(Schedulers.io())
+//                .subscribeOn(Schedulers.io())
+//                .subscribe(() -> {
+//                }, Timber::d);
     }
 
     @Override
@@ -110,6 +127,15 @@ public class TaskRemoteRepository implements ITaskRepository {
     @Override
     public Completable insertUsers(List<DomainUser> users) {
         return Completable.error(getError());
+    }
+
+    public Completable insertUser(DomainUser user) {
+        if (user != null) {
+            DocumentReference reference = mDatabase.collection(USER_COLLECTION_NAME).document(user.getUserId());
+            return RxFirestore.setDocument(reference, DomainToFirebaseConverter.convertUser(user));
+        } else {
+            return Completable.error(new IllegalArgumentException("user can't be null"));
+        }
     }
 
     @Override
